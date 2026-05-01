@@ -4,7 +4,6 @@
     
 **Cuando los Picos de Europa separan al paciente de su historia clínica, los datos deben cruzar la montaña antes que él.**
 
-[![CI](https://github.com/diaz-esparza/puente-idonia-recog/actions/workflows/ci.yml/badge.svg)](./.github/workflows/ci.yml)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type checked: pyright](https://img.shields.io/badge/types-pyright-blue.svg)](https://github.com/microsoft/pyright)
