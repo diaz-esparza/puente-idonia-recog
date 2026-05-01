@@ -1,12 +1,14 @@
 <div align="center">
-# Puente Idonia-Recog
 
+# Puente Idonia-Recog
+    
 **Cuando los Picos de Europa separan al paciente de su historia clínica, los datos deben cruzar la montaña antes que él.**
 
-[![CI](https://github.com/diaz-esparza/puente-idonia-recog/actions/workflows/ci.yml/badge.svg)](./.github/workflows/ci.yml)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type checked: pyright](https://img.shields.io/badge/types-pyright-blue.svg)](https://github.com/microsoft/pyright)
+
+</div>
 
 Presentamos un orquestador asíncrono que conecta **Idonia** (middleware de imagen médica) y **Recog** (IA de lenguaje natural) para resolver un problema real: la portabilidad de datos entre las comunidades autónomas en zonas rurales limítrofes entre comunidades autónomas.
 
