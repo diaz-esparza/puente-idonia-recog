@@ -1,0 +1,30 @@
+[project]
+name = "idonia-recog-bridge"
+version = "0.1.0"
+description = "Interoperability bridge between Idonia medical imaging middleware and Recog AI Framework for cross-border patient records. Async ingest of DICOM studies and reports, NLP-driven humanization with PII redaction, and secure Magic Link delivery, built with hash-chained audit logging."
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [
+    { name = "Sergio Díaz Esparza", email = "diaz.esparza@proton.me" },
+    { name = "Marina Dáder Suárez", email = "marina.dader.suarez@gmail.com" },
+]
+depkeywords = [
+    "healthcare",
+    "interoperability",
+    "dicom",
+    "medical-imaging",
+    "fastapi",
+    "hexagonal-architecture",
+    "audit-log",
+    "idonia",
+    "recog",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Typing :: Typed",
+]
+dendencies = []
