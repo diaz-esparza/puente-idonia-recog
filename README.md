@@ -104,16 +104,17 @@ Para más información, véase [`SECURITY.md`](./SECURITY.md)
 |------|------------|
 | Motor | Python 3.14 + asyncio |
 | Gestor de paquetes | [uv](https://github.com/astral-sh/uv) |
-| Arquitectura de servidor | FastAPI |
-| Validación de datos | Pydantic v2 |
-| Cliente HTTP | httpx + tenacity (lógica inteligente de reintentos) |
-| Persistencia | SQLite (rastro de auditoría) |
-| Observabilidad | structlog + OpenTelemetry |
-| Tests | pytest + pytest-asyncio + respx |
-| Control de calidad | ruff + pyright |
-| CI | GitHub Actions |
-| Ejecución | Typer + Rich CLI + Make |
-| Despliegue | Docker Compose (linux, distroless) |
+| Arquitectura de servidor | [FastAPI](https://fastapi.tiangolo.com/) |
+| Validación de datos | [Pydantic v2](https://pydantic.dev/docs/validation/latest/get-started/) |
+| Cliente HTTP | [httpx](https://www.python-httpx.org/) + [tenacity](https://tenacity.readthedocs.io/) (lógica inteligente de reintentos) |
+| Protección de PII/PHI | [Presidio](https://microsoft.github.io/presidio/) |
+| Persistencia | [SQLite](https://sqlite.org/)(rastro de auditoría) |
+| Observabilidad | [structlog](https://www.structlog.org/) + [OpenTelemetry](https://opentelemetry.io/) |
+| Tests | [pytest](https://docs.pytest.org/) + [pytest-asyncio](https://pytest-asyncio.readthedocs.io/) + [respx](https://lundberg.github.io/respx/) |
+| Control de calidad | [ruff](https://github.com/astral-sh/ruff) + [pyright](https://github.com/microsoft/pyright) |
+| CI | [GitHub Actions](https://github.com/features/actions) |
+| Ejecución | [Typer](https://typer.tiangolo.com/) + [Rich](https://github.com/textualize/rich) CLI + Make |
+| Despliegue | [Docker Compose](https://docs.docker.com/compose/) (linux, distroless) |
 
 ---
 
