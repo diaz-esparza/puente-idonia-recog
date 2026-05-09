@@ -1,30 +1,93 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
 [project]
-name = "idonia-recog-bridge"
+name = "puente"
 version = "0.1.0"
-description = "Interoperability bridge between Idonia medical imaging middleware and Recog AI Framework for cross-border patient records. Async ingest of DICOM studies and reports, NLP-driven humanization with PII redaction, and secure Magic Link delivery, built with hash-chained audit logging."
+description = """\
+  Interoperability bridge between Idonia medical imaging middleware and Recog AI Framework for cross-border patient \
+  records. Async ingest of DICOM studies and reports, NLP-driven humanization with PII redaction, and secure Magic \
+  Link delivery, built with hash-chained audit logging.\
+  """
 readme = "README.md"
-requires-python = ">=3.14"
+keywords = [
+  "audit-log",
+  "dicom",
+  "fastapi",
+  "healthcare",
+  "hexagonal-architecture",
+  "idonia",
+  "interoperability",
+  "medical-imaging",
+  "recog",
+]
 authors = [
-    { name = "Sergio Díaz Esparza", email = "diaz.esparza@proton.me" },
-    { name = "Marina Dáder Suárez", email = "marina.dader.suarez@gmail.com" },
+  { name = "Sergio Díaz Esparza", email = "diaz.esparza@proton.me" },
+  { name = "Marina Dáder Suárez", email = "marina.dader.suarez@gmail.com" },
 ]
-depkeywords = [
-    "healthcare",
-    "interoperability",
-    "dicom",
-    "medical-imaging",
-    "fastapi",
-    "hexagonal-architecture",
-    "audit-log",
-    "idonia",
-    "recog",
-]
+requires-python = ">=3.14"
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Healthcare Industry",
-    "Programming Language :: Python :: 3.12",
-    "Framework :: FastAPI",
-    "Topic :: Scientific/Engineering :: Medical Science Apps.",
-    "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Framework :: FastAPI",
+  "Intended Audience :: Healthcare Industry",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+  "Typing :: Typed",
 ]
-dendencies = []
+dependencies = [
+  "fastapi>=0.136.1",
+  "httpx>=0.28.1",
+  "pydantic>=2.13.4",
+  "pydantic-settings>=2.9.1",
+  "pyjwt>=2.10.1",
+  "pymupdf>=1.27.2.3",
+  "rich>=14",
+  "typer>=0.15.3",
+  "uvicorn>=0.34.2",
+]
+scripts.puente = "puente.cli.main:app"
+
+[dependency-groups]
+dev = [
+  "pyright>=1.1.409",
+  "pytest>=9.0.3",
+  "pytest-asyncio>=1.3",
+]
+
+[tool.hatch]
+build.targets.wheel.packages = [ "src/puente" ]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 79
+lint.select = [
+  "A",
+  "B",
+  "C4",
+  "D3",
+  "D400",
+  "D415",
+  "E",
+  "ERA",
+  "F",
+  "I",
+  "N",
+  "PERF",
+  "PL",
+  "RET",
+  "RUF",
+  "S",
+  "SIM",
+  "UP",
+  "W",
+]
+
+[tool.pyright]
+pythonVersion = "3.14"
+strict = [ "src/puente" ]
+
+[tool.pytest]
+ini_options.testpaths = [ "tests" ]
+ini_options.asyncio_mode = "auto"

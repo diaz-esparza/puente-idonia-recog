@@ -59,9 +59,9 @@ flowchart LR
 ## Ejecución
 
 ```bash
-# Demostración extremo a extremo
+# Demostración extremo a extremo (CLI directo, sin levantar API)
 make demo
-# Despliegue
+# Despliegue del servidor API
 make up
 # Pruebas
 make check
@@ -69,7 +69,7 @@ make test
 make test --fast
 ```
 
-Visor disponible en el Magic Link impreso al final de `make demo`.
+Visor disponible en el Magic Link impreso al final de la demostración.
 
 ---
 
