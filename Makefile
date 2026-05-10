@@ -7,7 +7,7 @@ demo:
 	uv run puente demo
 
 up:
-	uv run uvicorn puente.api.app:app --host 0.0.0.0 --port 8000 --reload
+	uv run puente serve
 
 format:
 	uv run ruff check --fix --silent --exit-zero

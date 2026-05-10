@@ -1,6 +1,7 @@
 import asyncio
 
 import typer
+import uvicorn
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -100,3 +101,15 @@ def demo() -> None:
     except Exception as e:
         console.print(f"\n[bold red]Pipeline failed:[/bold red] {e}")
         raise typer.Exit(code=1) from e
+
+
+@app.command()
+def serve() -> None:
+    """Run the Puente API server."""
+    settings = get_settings()
+    uvicorn.run(
+        "puente.api.app:app",
+        host=settings.app_host,
+        port=settings.app_port,
+        reload=settings.app_reload,
+    )

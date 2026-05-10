@@ -51,6 +51,7 @@ scripts.puente = "puente.cli.main:app"
 
 [dependency-groups]
 dev = [
+  "pyproject-fmt>=2.21.2",
   "pyright>=1.1.409",
   "pytest>=9.0.3",
   "pytest-asyncio>=1.3",
