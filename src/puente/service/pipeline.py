@@ -1,3 +1,4 @@
+import asyncio
 from typing import override
 
 from puente.config import get_settings
@@ -29,7 +30,8 @@ class BridgePipeline(PipelinePort):
         self,
         study: DicomStudy,
         report: bytes,
-    ) -> None:
+    ) -> str:
+        """Humanize and upload the report under a derivative description."""
         decoded_report = self.__pdf_to_text.convert(report)
         humanized_report = await self.__humanization.humanize(decoded_report)
         humanized_study = DicomStudy(
@@ -38,20 +40,33 @@ class BridgePipeline(PipelinePort):
             study_description=study.study_description
             + self.__humanized_suffix,
         )
-        _ = await self.__storage.upload_report(
+        return await self.__storage.upload_report(
             humanized_study,
             humanized_report,
         )
 
     @override
     async def run(self, record: MedicalRecordUpload) -> MagicLink:
-        _ = await self.__storage.upload_dicom(record.study, record.dicom_file)
-        _ = await self.__storage.upload_report(
-            record.study,
-            record.report_file,
+        # Do all the uploads in parallel.
+        tasks = [
+            self.__storage.upload_dicom(record.study, record.dicom_file),
+            self.__storage.upload_report(record.study, record.report_file),
+            self.manage_humanized_report(record.study, record.report_file),
+        ]
+        # Wait for at least one run to be completed before generating the magic
+        # link. This ensures that the location actually exists.
+        done, pending = await asyncio.wait(
+            (asyncio.create_task(i) for i in tasks),
+            return_when=asyncio.FIRST_COMPLETED,
         )
-        _ = await self.manage_humanized_report(
-            record.study,
-            record.report_file,
-        )
-        return await self.__storage.create_magic_link(record.study)
+        try:
+            _ = await asyncio.gather(*done)
+            magic_link = await self.__storage.create_magic_link(record.study)
+            # Wait for everything to finish before returning for future
+            # traceability. This _could_ possibly be optimized out
+            _ = await asyncio.gather(*pending)
+            return magic_link
+        finally:
+            # Avoids dangling background tasks
+            for task in pending:
+                _ = task.cancel()
