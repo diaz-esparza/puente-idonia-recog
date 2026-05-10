@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     idonia_output_url: str = "https://demo.idonia.com/v"
 
-    # Requires instantiation fron .env file
+    # Requires instantiation from .env file
     idonia_api_key: str = Field(init=False)
     idonia_api_secret: str = Field(init=False)
 
