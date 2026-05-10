@@ -39,7 +39,7 @@ def demo() -> None:
 
     study = DicomStudy(
         patient_id="12345678A",
-        accession_number="MRI-2024-001",
+        accession_number="MRI-2024-009",
         study_description="Rodilla_Derecha_PostOp",
     )
 

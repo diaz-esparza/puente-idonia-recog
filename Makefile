@@ -1,7 +1,4 @@
-.PHONY: demo up check test install lint format typecheck
-
-install:
-	uv pip install -e ".[dev]"
+.PHONY: demo up check test lint format typecheck
 
 version:
 	uv run puente version
