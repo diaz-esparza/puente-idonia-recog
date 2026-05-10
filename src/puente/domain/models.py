@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class StrictModel(BaseModel):
-    config: ClassVar[ConfigDict] = ConfigDict(
+    model_config: ClassVar[ConfigDict] = ConfigDict(
         strict=True,
         frozen=True,
         extra="forbid",
@@ -13,7 +13,7 @@ class StrictModel(BaseModel):
     )
 
 
-class DicomStudy(StrictModel):
+class DicomStudy(StrictModel, serialize_by_alias=True):
     """DICOM study metadata used for routing.
 
     Used both in the input data of our service, and on this service's
