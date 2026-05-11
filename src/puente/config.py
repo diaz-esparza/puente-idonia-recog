@@ -42,6 +42,10 @@ class Settings(BaseSettings):
 
     version: str = version(__package__) if __package__ is not None else "dev"
 
+    @property
+    def humanized_provider(self) -> str:
+        return "Recog AI" if not self.humanized_mock else "Mock local"
+
     @model_validator(mode="after")
     def validate_recog_config(self) -> Self:
         if not self.humanized_mock and not self.recog_api_key:

@@ -67,7 +67,8 @@ def demo() -> None:
             + "[dim](subida de DICOM e informe)[/dim]",
         )
         console.print(
-            "[bold]Fase II[/bold] — Humanización [dim](Recog AI)[/dim]",
+            "[bold]Fase II[/bold] — Humanización "
+            + f"[dim]({settings.humanized_provider})[/dim]",
         )
         console.print(
             "[bold]Fase III[/bold] — Entrega [dim](magic link)[/dim]\n",
