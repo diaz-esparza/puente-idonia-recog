@@ -21,7 +21,7 @@ class IdoniaAdapter(MedicalStoragePort):
         settings = get_settings()
 
         self.__client = httpx.AsyncClient(
-            base_url=settings.idonia_base_url.removeprefix("/"),
+            base_url=settings.idonia_base_url.rstrip("/"),
             timeout=60.0,
         )
 
@@ -37,7 +37,10 @@ class IdoniaAdapter(MedicalStoragePort):
         self.__jwt_cache_expiry: int = 0
 
     def _decode_secret(self, secret: str) -> bytes:
-        return base64.urlsafe_b64decode(secret.removeprefix("S2"))
+        prefix = "S2"
+        if not secret.startswith(prefix):
+            raise ValueError(f"API secret must start with '{prefix}' prefix.")
+        return base64.urlsafe_b64decode(secret.removeprefix(prefix))
 
     def _create_jwt(self) -> str:
         """Generate JWT for Idonia auth, save cache."""
