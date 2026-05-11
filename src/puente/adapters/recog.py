@@ -19,7 +19,7 @@ class RecogAdapter(ReportHumanizationPort):
         response = (
             await self.__client.post(
                 self.__url,
-                headers={"X-API-Key": self.__api_key},
+                headers={"X-API-Key": self.__api_key.get_secret_value()},
                 json={"dictationReport": report},
             )
         ).raise_for_status()

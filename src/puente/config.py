@@ -2,7 +2,7 @@ from functools import lru_cache
 from importlib.metadata import version
 from typing import ClassVar
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,14 +24,14 @@ class Settings(BaseSettings):
     idonia_output_url: str = "https://demo.idonia.com/v"
 
     # Requires instantiation from .env file
-    idonia_api_key: str = Field(init=False)
-    idonia_api_secret: str = Field(init=False)
+    idonia_api_key: SecretStr = Field(init=False)
+    idonia_api_secret: SecretStr = Field(init=False)
 
     recog_url: str = (
         "https://api.recog.es/relisten/dictation/process/report-results"
     )
     recog_timeout_s: int = 60
-    recog_api_key: str = Field(init=False)
+    recog_api_key: SecretStr = Field(init=False)
 
     humanized_suffix: str = "_HUMANIZADO"
 
