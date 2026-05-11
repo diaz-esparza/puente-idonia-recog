@@ -27,11 +27,17 @@ class Settings(BaseSettings):
     idonia_api_key: str = Field(init=False)
     idonia_api_secret: str = Field(init=False)
 
+    recog_url: str = (
+        "https://api.recog.es/relisten/dictation/process/report-results"
+    )
+    recog_timeout_s: int = 60
+    recog_api_key: str = Field(init=False)
+
+    humanized_suffix: str = "_HUMANIZADO"
+
     app_host: str = "127.0.0.1"
     app_port: int = 8000
     app_reload: bool = True
-
-    humanized_suffix: str = "_HUMANIZADO"
 
     version: str = version(__package__) if __package__ is not None else "dev"
 
