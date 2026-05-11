@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from puente.bootstrap import create_pipeline
+from puente.bootstrap import get_pipeline
 from puente.cli.mocks import create_demo_dicom, create_demo_report_pdf
 from puente.config import get_settings
 from puente.domain.models import DicomStudy, MedicalRecordUpload
@@ -67,13 +67,14 @@ def demo() -> None:
             + "[dim](subida de DICOM e informe)[/dim]",
         )
         console.print(
-            "[bold]Fase II[/bold] — Humanización [dim](Recog AI)[/dim]",
+            "[bold]Fase II[/bold] — Humanización "
+            + f"[dim]({settings.humanized_provider})[/dim]",
         )
         console.print(
             "[bold]Fase III[/bold] — Entrega [dim](magic link)[/dim]\n",
         )
 
-        pipeline = create_pipeline()
+        pipeline = get_pipeline()
 
         with console.status(
             "[bold green]Ejecutando pipeline extremo a extremo...",

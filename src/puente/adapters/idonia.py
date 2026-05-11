@@ -7,7 +7,7 @@ from typing import cast, override
 
 import httpx
 import jwt
-from pydantic import ValidationError
+from pydantic import SecretBytes, SecretStr, ValidationError
 
 from puente.config import get_settings
 from puente.domain.models import DicomStudy, MagicLink
@@ -36,21 +36,28 @@ class IdoniaAdapter(MedicalStoragePort):
         self.__jwt_cache_token: str | None = None
         self.__jwt_cache_expiry: int = 0
 
-    def _decode_secret(self, secret: str) -> bytes:
+    def _decode_secret(self, secret: SecretStr) -> SecretBytes:
         prefix = "S2"
-        if not secret.startswith(prefix):
+        decoded_secret = secret.get_secret_value()
+        if not decoded_secret.startswith(prefix):
             raise ValueError(f"API secret must start with '{prefix}' prefix.")
-        return base64.urlsafe_b64decode(secret.removeprefix(prefix))
+        return SecretBytes(
+            base64.urlsafe_b64decode(decoded_secret.removeprefix(prefix))
+        )
 
     def _create_jwt(self) -> str:
         """Generate JWT for Idonia auth, save cache."""
         now = int(time.time())
         payload = {
-            "sub": self.__api_key,
+            "sub": self.__api_key.get_secret_value(),
             "iat": now - self.__jwt_margin_min * 60,
             "exp": now + self.__jwt_ttl_min * 60,
         }
-        token: str = jwt.encode(payload, self.__api_secret, algorithm="HS256")
+        token: str = jwt.encode(
+            payload,
+            self.__api_secret.get_secret_value(),
+            algorithm="HS256",
+        )
         self.__jwt_cache_token = token
         self.__jwt_cache_expiry = now + (self.__jwt_ttl_min * 60) // 2
         return token

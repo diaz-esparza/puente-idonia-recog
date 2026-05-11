@@ -1,8 +1,8 @@
 from functools import lru_cache
 from importlib.metadata import version
-from typing import ClassVar
+from typing import ClassVar, Self
 
-from pydantic import Field
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,16 +24,37 @@ class Settings(BaseSettings):
     idonia_output_url: str = "https://demo.idonia.com/v"
 
     # Requires instantiation from .env file
-    idonia_api_key: str = Field(init=False)
-    idonia_api_secret: str = Field(init=False)
+    idonia_api_key: SecretStr = Field(init=False)
+    idonia_api_secret: SecretStr = Field(init=False)
+
+    recog_url: str = (
+        "https://api.recog.es/relisten/dictation/process/report-results"
+    )
+    recog_timeout_s: int = Field(default=60, gt=0)
+    recog_api_key: SecretStr = SecretStr("")
+
+    humanized_suffix: str = "_HUMANIZADO"
+    humanized_mock: bool = False
 
     app_host: str = "127.0.0.1"
     app_port: int = 8000
     app_reload: bool = True
 
-    humanized_suffix: str = "_HUMANIZADO"
-
     version: str = version(__package__) if __package__ is not None else "dev"
+
+    @property
+    def humanized_provider(self) -> str:
+        return "Recog AI" if not self.humanized_mock else "Mock local"
+
+    @model_validator(mode="after")
+    def validate_recog_config(self) -> Self:
+        if not self.humanized_mock and not self.recog_api_key:
+            prefix = self.model_config.get("env_prefix", "")
+            raise ValueError(
+                f"{prefix}RECOG_API_KEY is required when "
+                + f"{prefix}HUMANIZED_MOCK is false",
+            )
+        return self
 
 
 @lru_cache(maxsize=1)
