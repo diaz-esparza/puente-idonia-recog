@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     recog_url: str = (
         "https://api.recog.es/relisten/dictation/process/report-results"
     )
-    recog_timeout_s: int = 60
+    recog_timeout_s: int = Field(default=60, gt=0)
     recog_api_key: SecretStr = Field(init=False)
 
     humanized_suffix: str = "_HUMANIZADO"
