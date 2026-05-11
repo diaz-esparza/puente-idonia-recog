@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     recog_api_key: SecretStr = Field(init=False)
 
     humanized_suffix: str = "_HUMANIZADO"
+    humanized_mock: bool = False
 
     app_host: str = "127.0.0.1"
     app_port: int = 8000
