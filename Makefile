@@ -1,4 +1,4 @@
-.PHONY: demo up check test lint format typecheck
+.PHONY: version demo up check test lint format typecheck
 
 DOCKER := $(shell command -v docker 2>/dev/null)
 

@@ -6,6 +6,9 @@
 # GitHub
 .github
 
+# CI / Automation
+.coderabbit.yaml
+
 # Python cache & venvs
 __pycache__
 *.py[cod]
@@ -43,6 +46,12 @@ dist/
 
 # Docker
 Dockerfile
-docker-compose*.yml
-docker-compose*.yaml
 .dockerignore
+
+# Docs (README.md is kept for pyproject.toml wheel metadata)
+*.md
+!README.md
+.python-version
+
+# Reference docs (not needed at runtime)
+temp-api-docs/
