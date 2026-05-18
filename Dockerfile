@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.14-trixie-slim
+FROM ghcr.io/astral-sh/uv@sha256:1b882e1fa1834b0c26764ad6494e3151de499ed34dfa13826f9f395f5110f519
 
 LABEL org.opencontainers.image.title="Puente Idonia-Recog" \
       org.opencontainers.image.description="Interoperability bridge between Idonia medical imaging middleware and Recog AI report humanization." \
