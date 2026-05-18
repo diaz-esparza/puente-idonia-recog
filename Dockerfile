@@ -12,7 +12,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+    UV_LINK_MODE=copy \
+    PYTHONUNBUFFERED=1
 
 # Only copying lockfiles first makes dependency cache not break
 COPY pyproject.toml .
@@ -37,10 +38,6 @@ RUN groupadd --system appgroup \
     && chown -R appuser:appgroup /app
 
 USER appuser
-
-ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1 \
-    PUENTE_APP_HOST=0.0.0.0
 
 EXPOSE 8000
 
