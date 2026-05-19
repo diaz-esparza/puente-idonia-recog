@@ -7,6 +7,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from puente.bootstrap import get_pipeline
+from puente.cli import healthcheck
 from puente.cli.mocks import create_demo_dicom, create_demo_report_pdf
 from puente.config import get_settings
 from puente.domain.models import DicomStudy, MedicalRecordUpload
@@ -114,3 +115,12 @@ def serve() -> None:
         port=settings.app_port,
         reload=settings.app_reload,
     )
+
+
+@app.command()
+def healthcheck_cmd() -> None:
+    """Run the health check probe against the API server."""
+    try:
+        healthcheck.main()
+    except Exception as e:
+        raise typer.Exit(code=1) from e

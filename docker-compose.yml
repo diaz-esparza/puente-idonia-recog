@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: puente
     ports:
-      - ${PUENTE_APP_PORT:-8000}:8000
+      - ${PUENTE_APP_PORT:-8000}:${PUENTE_APP_PORT:-8000}
     env_file:
       - path: .env
         required: false
@@ -13,11 +13,10 @@ services:
     healthcheck:
       test:
         - CMD
-        - python
-        - -c
-        - |
-          import httpx
-          httpx.get("http://localhost:8000/health").raise_for_status()
+        - uv
+        - run
+        - puente
+        - healthcheck
       interval: 30s
       timeout: 10s
       retries: 3
