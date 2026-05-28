@@ -15,7 +15,7 @@ format:
 	uv run ruff check --fix --silent --exit-zero
 	uv run ruff format src tests
 	uv run pyproject-fmt pyproject.toml -n || true
-	uv run yamlfix docker-compose.yml
+	uv run yamlfix compose.yaml
 
 check: lint typecheck test
 
@@ -30,7 +30,7 @@ lint:
 		echo "Skipping docker build --check (docker not available)"; \
 		echo "Skipping docker compose config (docker not available)"; \
 	fi
-	uv run yamlfix --check docker-compose.yml
+	uv run yamlfix --check compose.yaml
 
 typecheck:
 	uv run pyright src tests

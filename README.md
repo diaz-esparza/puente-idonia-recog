@@ -127,7 +127,7 @@ SECURITY.md
 
 Makefile
 Dockerfile
-docker-compose.yml
+compose.yaml
 
 src/puente/
 ├── domain/      # Modelos puros, sin I/O
