@@ -62,18 +62,23 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_app_host(cls, v: str) -> str:
         try:
-            ipaddress.ip_address(v)
+            _ = ipaddress.ip_address(v)
             return v
         except ValueError:
             pass
-        try:
-            return socket.gethostbyname(v)
-        except socket.gaierror:
-            prefix = cls.model_config.get("env_prefix", "")
-            raise ValueError(
-                f"{prefix}APP_HOST must be a valid IP or resolvable hostname, "
-                + f"got: '{v}'"
-            ) from None
+        for family in (socket.AF_INET, socket.AF_INET6):
+            try:
+                addrs = socket.getaddrinfo(v, None, family=family)
+            except socket.gaierror:
+                continue
+            host = addrs[0][4][0]
+            if isinstance(host, str):
+                return host
+        prefix = cls.model_config.get("env_prefix", "")
+        raise ValueError(
+            f"{prefix}APP_HOST must be a valid IP or resolvable hostname, "
+            + f"got: '{v}'"
+        ) from None
 
 
 @lru_cache(maxsize=1)
