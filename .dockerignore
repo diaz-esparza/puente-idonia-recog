@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# GitHub
+.github
+
+# CI / Automation
+.coderabbit.yaml
+
+# Python cache & venvs
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+
+# Environment & secrets (never bake these into images!)
+.env
+.env.*
+*.pem
+*.key
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Docs (README.md is kept for pyproject.toml wheel metadata)
+*.md
+!README.md
+.python-version
+
+# Reference docs (not needed at runtime)
+temp-api-docs/

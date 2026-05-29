@@ -1,0 +1,23 @@
+services:
+  puente:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: puente
+    ports:
+      - ${PUENTE_APP_PORT:-8000}:${PUENTE_APP_PORT:-8000}
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - uv
+        - run
+        - puente
+        - healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

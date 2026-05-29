@@ -1,8 +1,10 @@
+import ipaddress
+import socket
 from functools import lru_cache
 from importlib.metadata import version
 from typing import ClassVar, Self
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,7 +39,7 @@ class Settings(BaseSettings):
     humanized_mock: bool = False
 
     app_host: str = "127.0.0.1"
-    app_port: int = 8000
+    app_port: int = Field(default=8000, gt=0, le=65535)
     app_reload: bool = True
 
     version: str = version(__package__) if __package__ is not None else "dev"
@@ -55,6 +57,28 @@ class Settings(BaseSettings):
                 + f"{prefix}HUMANIZED_MOCK is false",
             )
         return self
+
+    @field_validator("app_host", mode="after")
+    @classmethod
+    def normalize_app_host(cls, v: str) -> str:
+        try:
+            _ = ipaddress.ip_address(v)
+            return v
+        except ValueError:
+            pass
+        for family in (socket.AF_INET, socket.AF_INET6):
+            try:
+                addrs = socket.getaddrinfo(v, None, family=family)
+            except socket.gaierror:
+                continue
+            host = addrs[0][4][0]
+            if isinstance(host, str):
+                return host
+        prefix = cls.model_config.get("env_prefix", "")
+        raise ValueError(
+            f"{prefix}APP_HOST must be a valid IP or resolvable hostname, "
+            + f"got: '{v}'"
+        ) from None
 
 
 @lru_cache(maxsize=1)
