@@ -98,11 +98,11 @@ def configure_logging() -> None:
 def configure_tracing() -> None:
     settings = get_settings()
     service_name = settings.otel_service_name
-    environment = settings.otel_environment
     resource = Resource.create(
         {
             "service.name": service_name,
-            "deployment.environment": environment,
+            "service.version": settings.version,
+            "deployment.environment": settings.otel_environment,
         }
     )
     provider = TracerProvider(resource=resource)

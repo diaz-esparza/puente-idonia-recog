@@ -27,6 +27,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - internal
+      - default
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
@@ -39,6 +42,8 @@ services:
       - ./config/otelcol.yaml:/etc/otelcol.yaml:ro
     expose:
       - '4317' # gRPC
+    networks:
+      - internal
 
   tempo:
     image: grafana/tempo:latest
@@ -47,8 +52,9 @@ services:
     volumes:
       - ./config/tempo.yaml:/etc/tempo.yaml:ro
     expose:
-      - '3200'
       - '4317'
+    networks:
+      - internal
 
   loki:
     image: grafana/loki:latest
@@ -56,6 +62,8 @@ services:
       - --config.file=/etc/loki/local-config.yaml
     expose:
       - '3100'
+    networks:
+      - internal
 
   grafana:
     image: grafana/grafana:latest
@@ -67,3 +75,11 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
       GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+    networks:
+      - internal
+      - default
+
+
+networks:
+  internal:
+    internal: true
