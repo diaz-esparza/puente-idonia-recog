@@ -2,6 +2,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
 
 
 processors:
@@ -15,7 +16,7 @@ exporters:
     tls:
       insecure: true
 
-  loki:
+  otlp_http/loki:
     endpoint: http://loki:3100/loki/api/v1/push
 
 
@@ -29,7 +30,6 @@ service:
         - batch
       exporters:
         - otlp/tempo
-        - otlphttp/audit
 
     logs:
       receivers:
@@ -37,5 +37,4 @@ service:
       processors:
         - batch
       exporters:
-        - loki
-        - otlphttp/audit
+        - otlp_http/loki

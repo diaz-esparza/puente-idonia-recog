@@ -6,13 +6,15 @@ services:
       dockerfile: Dockerfile
     command:
       - serve
+    depends_on:
+      - otelcol
     ports:
       - ${PUENTE_APP_PORT:-8000}:${PUENTE_APP_PORT:-8000}
     env_file:
       - path: .env
         required: false
     environment:
-      PUENTE_OTEL_ENDPOINT: otel-collector:4317
+      PUENTE_OTEL_ENDPOINT: otelcol:4317
     restart: unless-stopped
     healthcheck:
       test:
@@ -26,8 +28,11 @@ services:
       retries: 3
       start_period: 10s
 
-  otel-collector:
+  otelcol:
     image: otel/opentelemetry-collector-contrib:latest
+    depends_on:
+      - tempo
+      - loki
     command:
       - --config=/etc/otelcol.yaml
     volumes:
@@ -43,6 +48,7 @@ services:
       - ./config/tempo.yaml:/etc/tempo.yaml:ro
     expose:
       - '3200'
+      - '4317'
 
   loki:
     image: grafana/loki:latest

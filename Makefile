@@ -8,7 +8,7 @@ version:
 	uv run puente version
 
 up:
-	docker compose up -d --build
+	docker compose up -d --build --remove-orphans
 
 demo: up
 	docker compose exec -it puente bash -c "uv run puente demo"
