@@ -7,11 +7,11 @@ YAML_FILES := $(shell git ls-files '*.yaml' | paste -sd ' ' || true)
 version:
 	uv run puente version
 
-demo:
-	uv run puente demo
-
 up:
-	uv run puente serve
+	docker compose up -d --build
+
+demo: up
+	docker compose exec -it puente bash -c "uv run puente demo"
 
 format:
 	uv run ruff check --fix --silent --exit-zero
