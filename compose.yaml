@@ -1,4 +1,5 @@
 services:
+
   puente:
     build:
       context: .
@@ -21,3 +22,39 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command:
+      - --config=/etc/otelcol.yaml
+    volumes:
+      - ./config/otelcol.yaml:/etc/otelcol.yaml:ro
+    expose:
+      - '4317' # gRPC
+
+  tempo:
+    image: grafana/tempo:latest
+    command:
+      - --config.file=/etc/tempo.yaml
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo.yaml:ro
+    expose:
+      - '3200'
+
+  loki:
+    image: grafana/loki:latest
+    command:
+      - --config.file=/etc/loki/local-config.yaml
+    expose:
+      - '3100'
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/puente.yaml:ro
+    ports:
+      - 3000:3000
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'

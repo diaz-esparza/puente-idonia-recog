@@ -1,6 +1,8 @@
 .PHONY: version demo up check test lint format typecheck
 
 DOCKER := $(shell command -v docker 2>/dev/null)
+YAML_FILES := $(shell git ls-files '*.yaml' | paste -sd ' ' || true)
+
 
 version:
 	uv run puente version
@@ -15,7 +17,7 @@ format:
 	uv run ruff check --fix --silent --exit-zero
 	uv run ruff format src tests
 	uv run pyproject-fmt pyproject.toml -n || true
-	uv run yamlfix compose.yaml
+	uv run yamlfix $(YAML_FILES)
 
 check: lint typecheck test
 
@@ -30,7 +32,7 @@ lint:
 		echo "Skipping docker build --check (docker not available)"; \
 		echo "Skipping docker compose config (docker not available)"; \
 	fi
-	uv run yamlfix --check compose.yaml
+	uv run yamlfix --check $(YAML_FILES)
 
 typecheck:
 	uv run pyright src tests

@@ -106,3 +106,5 @@ ini_options.asyncio_mode = "auto"
 explicit_start = false
 sequence_style = "block_style"
 line_length = 120
+whitelines = 1
+section_whitelines = 2
