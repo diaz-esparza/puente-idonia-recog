@@ -5,6 +5,7 @@ from pydantic import Base64Bytes, BaseModel, ConfigDict, Field
 
 class StrictModel(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(
+        strict=True,
         frozen=True,
         extra="forbid",
         validate_default=True,
@@ -28,8 +29,9 @@ class MedicalRecordUpload(StrictModel):
     """Aggregate root representing the complete patient upload data."""
 
     study: DicomStudy
-    report_file: Base64Bytes
-    dicom_file: Base64Bytes
+    # We need non-strict fields because we coerce from b64 strings
+    report_file: Base64Bytes = Field(strict=False)
+    dicom_file: Base64Bytes = Field(strict=False)
 
 
 class MagicLink(StrictModel):
