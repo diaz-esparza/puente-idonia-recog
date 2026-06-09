@@ -11,13 +11,13 @@ processors:
 
 exporters:
 
-  otlp/tempo:
+  otlp_grpc/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
 
   otlp_http/loki:
-    endpoint: http://loki:3100/loki/api/v1/push
+    endpoint: http://loki:3100/otlp
 
 
 service:
@@ -29,7 +29,7 @@ service:
       processors:
         - batch
       exporters:
-        - otlp/tempo
+        - otlp_grpc/tempo
 
     logs:
       receivers:

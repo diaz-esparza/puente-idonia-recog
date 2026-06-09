@@ -5,9 +5,14 @@ from typing import Any
 import orjson
 import structlog
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc._log_exporter import (
+    OTLPLogExporter,
+)
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
     OTLPSpanExporter,
 )
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -88,6 +93,28 @@ def configure_logging() -> None:
     root_logger.setLevel(log_level)
 
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+
+    otel_endpoint = settings.otel_endpoint
+    if otel_endpoint is not None:
+        log_resource = Resource.create(
+            {
+                "service.name": service_name,
+                "service.version": settings.version,
+                "deployment.environment": environment,
+            }
+        )
+        log_provider = LoggerProvider(resource=log_resource)
+        log_provider.add_log_record_processor(
+            BatchLogRecordProcessor(
+                OTLPLogExporter(
+                    endpoint=otel_endpoint,
+                    insecure=settings.otel_connect_insecurely,
+                )
+            )
+        )
+        root_logger.addHandler(
+            LoggingHandler(logger_provider=log_provider)
+        )
 
     _ = structlog.contextvars.bind_contextvars(
         service=service_name,
