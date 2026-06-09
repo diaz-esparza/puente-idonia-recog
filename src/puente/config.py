@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     recog_api_key: SecretStr = SecretStr("")
 
     humanized_suffix: str = "_HUMANIZADO"
-    humanized_mock: bool = False
+    humanized_mock: bool = True
 
     otel_service_name: str = "PUENTE"
     otel_environment: str = "dev"
