@@ -40,11 +40,15 @@ def serve() -> None:
     )
 
 
+async def _async_healthcheck():
+    async with DemoClient() as client:
+        await client.healthcheck()
+
+
 @app.command()
 def healthcheck() -> None:
     """Run the health check probe against the API server."""
     try:
-        client = DemoClient()
-        asyncio.run(client.healthcheck())
+        asyncio.run(_async_healthcheck())
     except Exception:
         raise typer.Exit(code=1) from None
