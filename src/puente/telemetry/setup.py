@@ -60,8 +60,7 @@ def configure_logging() -> None:
         structlog.processors.UnicodeDecoder(),
         structlog.processors.CallsiteParameterAdder(
             {
-                structlog.processors.CallsiteParameter.FILENAME,
-                structlog.processors.CallsiteParameter.FUNC_NAME,
+                # LINENO is enough as we setup loggers per module
                 structlog.processors.CallsiteParameter.LINENO,
             }
         ),
@@ -103,8 +102,8 @@ def configure_logging() -> None:
                 "deployment.environment": environment,
             }
         )
-        log_provider = LoggerProvider(resource=log_resource)
-        log_provider.add_log_record_processor(
+        logger_provider = LoggerProvider(resource=log_resource)
+        logger_provider.add_log_record_processor(
             BatchLogRecordProcessor(
                 OTLPLogExporter(
                     endpoint=otel_endpoint,
@@ -112,9 +111,7 @@ def configure_logging() -> None:
                 )
             )
         )
-        root_logger.addHandler(
-            LoggingHandler(logger_provider=log_provider)
-        )
+        root_logger.addHandler(LoggingHandler(logger_provider=logger_provider))
 
     _ = structlog.contextvars.bind_contextvars(
         service=service_name,

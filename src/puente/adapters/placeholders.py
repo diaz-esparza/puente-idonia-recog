@@ -6,7 +6,6 @@ from typing import override
 import pymupdf
 
 from puente.domain.ports import ReportHumanizationPort
-
 from puente.telemetry.getters import get_logger
 
 _logger = get_logger(__name__)

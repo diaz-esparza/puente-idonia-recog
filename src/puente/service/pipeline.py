@@ -35,9 +35,13 @@ class BridgePipeline(PipelinePort):
 
     @staticmethod
     def _trace_study(span: trace.Span, study: DicomStudy) -> None:
-        span.set_attribute("patient_id", study.patient_id)
-        span.set_attribute("accession_number", study.accession_number)
-        span.set_attribute("study_description", study.study_description)
+        span.set_attributes(
+            {
+                "study.patient_id": study.patient_id,
+                "study.accession_number": study.accession_number,
+                "study.description": study.study_description,
+            }
+        )
 
     async def _humanize_and_upload(
         self,
