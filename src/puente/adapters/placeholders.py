@@ -6,6 +6,9 @@ from typing import override
 import pymupdf
 
 from puente.domain.ports import ReportHumanizationPort
+from puente.telemetry.getters import get_logger
+
+_logger = get_logger(__name__)
 
 
 class DummyHumanizationAdapter(ReportHumanizationPort):
@@ -19,4 +22,5 @@ class DummyHumanizationAdapter(ReportHumanizationPort):
             + "sino un parche temporal para pruebas"
         )
         _ = page.insert_text((72, 72), report, fontsize=12)
+        _logger.warning("mock_humanization")
         return document.tobytes()

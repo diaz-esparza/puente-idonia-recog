@@ -5,12 +5,31 @@ These helpers are slated for removal once the project migrates to
 proper pytest-based fixtures and integration tests.
 """
 
+import base64
 import struct
 
 import pymupdf
 
+from puente.domain.models import DicomStudy, MedicalRecordUpload
 
-def create_demo_report_pdf() -> bytes:
+
+def build_demo_record() -> MedicalRecordUpload:
+    """Generate the synthetic patient data used for the end-to-end demo."""
+    study = DicomStudy(
+        patient_id="12345678A",
+        accession_number="MRI-2024-009",
+        study_description="Rodilla_Derecha_PostOp",
+    )
+    report_pdf = _create_demo_report_pdf()
+    dicom_file = _create_demo_dicom()
+    return MedicalRecordUpload(
+        study=study,
+        report_file=base64.b64encode(report_pdf),
+        dicom_file=base64.b64encode(dicom_file),
+    )
+
+
+def _create_demo_report_pdf() -> bytes:
     """Generate a synthetic surgical report PDF for the demo."""
     doc = pymupdf.open()
     page = doc.new_page()
@@ -34,7 +53,7 @@ def create_demo_report_pdf() -> bytes:
     return doc.tobytes()
 
 
-def create_demo_dicom() -> bytes:
+def _create_demo_dicom() -> bytes:
     """Generate a minimal DICOM file for the demo."""
     preamble = b"\x00" * 128
     magic = b"DICM"

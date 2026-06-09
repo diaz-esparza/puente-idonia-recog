@@ -1,14 +1,21 @@
 services:
+
   puente:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: puente
+    command:
+      - serve
+    depends_on:
+      - otelcol
     ports:
       - ${PUENTE_APP_PORT:-8000}:${PUENTE_APP_PORT:-8000}
     env_file:
       - path: .env
         required: false
+    environment:
+      PUENTE_OTEL_ENDPOINT: otelcol:4317
+      PUENTE_OTEL_CONNECT_INSECURELY: true
     restart: unless-stopped
     healthcheck:
       test:
@@ -21,3 +28,63 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - internal
+      - default
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.153.0@sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
+    depends_on:
+      - tempo
+      - loki
+    command:
+      - --config=/etc/otelcol.yaml
+    volumes:
+      - ./config/otelcol.yaml:/etc/otelcol.yaml:ro
+    expose:
+      - '4317' # gRPC
+    networks:
+      - internal
+
+  tempo:
+    image: grafana/tempo:3.0.1@sha256:1ce31d6d7ffab62189685e8c47881d4a561c5d38bd0dbd66e40ca83cef07923d
+    command:
+      - --config.file=/etc/tempo.yaml
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo.yaml:ro
+    expose:
+      - '4317'
+    networks:
+      - internal
+
+  loki:
+    image: grafana/loki:3.6.11@sha256:191d4fdfb7264f16989f0a57f320872620a5a7c2ceeec6229212c4190ec49b86
+    command:
+      - --config.file=/etc/loki.yaml
+    volumes:
+      - ./config/loki.yaml:/etc/loki.yaml:ro
+    tmpfs:
+      - /tmp/loki
+    expose:
+      - '3100'
+    networks:
+      - internal
+
+  grafana:
+    image: grafana/grafana:13.0.2@sha256:5dad0df181cb644a14e13617b913b261a54f7d4fd4510721dba420929f35bea2
+    volumes:
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/puente.yaml:ro
+    expose:
+      - '3000'
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+    networks:
+      - internal
+      - default
+
+
+networks:
+  internal:
+    internal: true

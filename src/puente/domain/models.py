@@ -1,6 +1,6 @@
 from typing import ClassVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Base64Bytes, BaseModel, ConfigDict, Field
 
 
 class StrictModel(BaseModel):
@@ -9,11 +9,11 @@ class StrictModel(BaseModel):
         frozen=True,
         extra="forbid",
         validate_default=True,
-        revalidate_instances="always",
+        serialize_by_alias=True,
     )
 
 
-class DicomStudy(StrictModel, serialize_by_alias=True):
+class DicomStudy(StrictModel):
     """DICOM study metadata used for routing.
 
     Used both in the input data of our service, and on this service's
@@ -29,8 +29,9 @@ class MedicalRecordUpload(StrictModel):
     """Aggregate root representing the complete patient upload data."""
 
     study: DicomStudy
-    report_file: bytes
-    dicom_file: bytes
+    # We need non-strict fields because we coerce from b64 strings
+    report_file: Base64Bytes = Field(strict=False)
+    dicom_file: Base64Bytes = Field(strict=False)
 
 
 class MagicLink(StrictModel):
