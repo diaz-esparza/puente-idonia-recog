@@ -121,3 +121,9 @@ class BridgePipeline(PipelinePort):
             finally:
                 for task in pending:
                     _ = task.cancel()
+                # Avoids "Task exception was never retrieved" issues
+                if pending:
+                    _ = await asyncio.gather(
+                        *pending,
+                        return_exceptions=True,
+                    )
