@@ -15,6 +15,7 @@ services:
         required: false
     environment:
       PUENTE_OTEL_ENDPOINT: otelcol:4317
+      PUENTE_OTEL_CONNECT_INSECURELY: true
     restart: unless-stopped
     healthcheck:
       test:

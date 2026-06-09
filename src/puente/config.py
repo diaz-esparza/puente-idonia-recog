@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     otel_environment: str = "dev"
     otel_log_level: str = "INFO"
     otel_endpoint: str | None = None
-    otel_connect_insecurely: bool = True
+    otel_connect_insecurely: bool = False
 
     app_host: str = "127.0.0.1"
     app_port: int = Field(default=8000, gt=0, le=65535)
