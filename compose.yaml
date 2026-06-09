@@ -59,7 +59,11 @@ services:
   loki:
     image: grafana/loki:latest
     command:
-      - --config.file=/etc/loki/local-config.yaml
+      - --config.file=/etc/loki.yaml
+    volumes:
+      - ./config/loki.yaml:/etc/loki.yaml:ro
+    tmpfs:
+      - /tmp/loki
     expose:
       - '3100'
     networks:
