@@ -1,4 +1,5 @@
 import asyncio
+from hashlib import sha256
 from typing import override
 
 from opentelemetry import trace
@@ -34,12 +35,20 @@ class BridgePipeline(PipelinePort):
         self.__humanized_suffix = settings.humanized_suffix
 
     @staticmethod
-    def _trace_study(span: trace.Span, study: DicomStudy) -> None:
+    def _privacy_hash(attribute: str) -> str:
+        return sha256(attribute.encode()).hexdigest()
+
+    @classmethod
+    def _trace_study(cls, span: trace.Span, study: DicomStudy) -> None:
         span.set_attributes(
             {
-                "study.patient_id": study.patient_id,
-                "study.accession_number": study.accession_number,
-                "study.description": study.study_description,
+                "study.sha256.patient_id": cls._privacy_hash(study.patient_id),
+                "study.sha256.accession_number": cls._privacy_hash(
+                    study.accession_number
+                ),
+                "study.sha256.description": cls._privacy_hash(
+                    study.study_description
+                ),
             }
         )
 
