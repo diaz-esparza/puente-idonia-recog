@@ -9,6 +9,13 @@ version:
 
 up:
 	docker compose up -d --build --remove-orphans
+	@ID=$$(docker compose ps -q grafana 2>/dev/null); \
+	if [ -n "$$ID" ]; then \
+		IP=$$(docker inspect $$ID --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $$1}'); \
+		echo; \
+		echo "  Grafana -> http://$$IP:3000"; \
+		echo; \
+	fi
 
 demo: up
 	docker compose exec -it puente bash -c "uv run puente demo"
