@@ -158,7 +158,7 @@ class IdoniaAdapter(MedicalStoragePort):
                     _logger.info(
                         "idonia_magic_link_created",
                         route=route,
-                        url=magic.url,
+                        url_length=len(magic.url),
                         endpoint_duration_ms=timer.duration_ms,
                     )
                     return magic
