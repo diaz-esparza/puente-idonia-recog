@@ -1,5 +1,7 @@
+import asyncio
 import ipaddress
-import time
+from types import TracebackType
+from typing import Self
 
 import httpx
 
@@ -12,8 +14,19 @@ class DemoClient:
         self.__host = self.infer_endpoint()
         self.__client = httpx.AsyncClient(base_url=self.__host, timeout=10)
 
+    async def __aenter__(self) -> Self:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        await self.__client.aclose()
+
     @property
-    def host(self):
+    def host(self) -> str:
         return self.__host
 
     @staticmethod
@@ -40,7 +53,7 @@ class DemoClient:
         source_exception = None
         for i in range(3):
             if i > 0:
-                time.sleep(5)
+                await asyncio.sleep(5)
             try:
                 _ = (
                     await self.__client.get("/health", timeout=10)

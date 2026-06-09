@@ -75,24 +75,24 @@ def _print_result(console: Console, magic_link: MagicLink) -> None:
 
 async def _run_api(
     console: Console,
-    client: DemoClient,
     record: MedicalRecordUpload,
 ) -> MagicLink:
-    with console.status(
-        f"[bold yellow]Buscando servidor en {client.host}...",
-    ):
-        await client.healthcheck()
-    console.print(
-        f"[bold cyan]Servidor detectado[/bold cyan] en {client.host}."
-    )
-    with console.status(
-        "[bold green]Enviando registro, humanizando informe y "
-        + "recibiendo el magic link...",
-    ):
-        return await client.run_pipeline(record)
+    async with DemoClient() as client:
+        with console.status(
+            f"[bold yellow]Buscando servidor en {client.host}...",
+        ):
+            await client.healthcheck()
+        console.print(
+            f"[bold cyan]Servidor detectado[/bold cyan] en {client.host}."
+        )
+        with console.status(
+            "[bold green]Enviando registro, humanizando informe y "
+            + "recibiendo el magic link...",
+        ):
+            return await client.run_pipeline(record)
 
 
-def main(console: Console):
+def main(console: Console) -> None:
     _print_banner(console)
 
     with console.status("[bold green]Generando documentos de prueba..."):
@@ -100,11 +100,10 @@ def main(console: Console):
 
     _print_patient_info(console, record.study)
     _print_phases(console)
-    client = DemoClient()
     record = build_demo_record()
 
     try:
-        magic_link = asyncio.run(_run_api(console, client, record))
+        magic_link = asyncio.run(_run_api(console, record))
     except httpx.HTTPStatusError as exc:
         console.print(
             "\n[bold red]Error de la API:[/bold red] "
