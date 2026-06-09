@@ -45,4 +45,4 @@ typecheck:
 	uv run pyright src tests
 
 test:
-	uv run pytest tests -sv
+	uv run pytest tests -v
