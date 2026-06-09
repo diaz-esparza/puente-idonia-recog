@@ -33,4 +33,4 @@ class Timer:
     def duration_ms(self) -> int:
         if self.__elapsed_ns is None:
             raise RuntimeError("Timer not stopped")
-        return self.__elapsed_ns // 1_000
+        return self.__elapsed_ns // 1_000_000
