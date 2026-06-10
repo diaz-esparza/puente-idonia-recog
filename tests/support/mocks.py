@@ -5,9 +5,11 @@ from typing import Any
 import orjson
 import respx
 
+_ERROR_STATUS = 500
+
 
 class IdoniaMock:
-    """Convenient façade over ``respx`` routes for the Idonia staging API."""
+    """Convenient mock over `respx` routes for the Idonia staging API."""
 
     def __init__(self, router: respx.MockRouter, base_url: str) -> None:
         self.__base = base_url.rstrip("/")
@@ -41,17 +43,21 @@ class IdoniaMock:
             "Magic link creation was not requested"
         )
 
-    def respond_dicom_error(self, status: int) -> None:
+    def respond_dicom_error(self) -> None:
         """Replace the DICOM route response with an error."""
-        _ = self.__dicom_route.respond(status)
+        _ = self.__dicom_route.respond(_ERROR_STATUS)
 
-    def respond_report_error(self, status: int) -> None:
+    def respond_report_error(self) -> None:
         """Replace the report route response with an error."""
-        _ = self.__report_route.respond(status)
+        _ = self.__report_route.respond(_ERROR_STATUS)
+
+    def respond_magic_link_error(self) -> None:
+        """Replace the magic link response with an error."""
+        _ = self.__magic_put_route.respond(_ERROR_STATUS)
 
 
 class RecogMock:
-    """Convenient façade over ``respx`` routes for the Recog AI API."""
+    """Convenient mock over `respx` routes for the Recog AI API."""
 
     def __init__(self, router: respx.MockRouter, url: str) -> None:
         self.__url = url
@@ -60,9 +66,9 @@ class RecogMock:
     def respond_with_pdf(self, pdf_bytes: bytes) -> None:
         _ = self.__route.respond(200, content=pdf_bytes)
 
-    def respond_with_error(self, status: int) -> None:
+    def respond_with_error(self) -> None:
         """Replace the Recog route response with an error status."""
-        _ = self.__route.respond(status)
+        _ = self.__route.respond(_ERROR_STATUS)
 
     def assert_humanization_requested(self) -> None:
         assert self.__route.called, "Recog humanization was not requested"

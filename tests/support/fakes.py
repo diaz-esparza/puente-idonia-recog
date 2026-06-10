@@ -1,4 +1,7 @@
-"""In-memory fake port implementations for integration tests."""
+"""In-memory fake port implementations for integration tests.
+
+Exceptions raise self.__class__.__name__ to identify its source class.
+"""
 
 import asyncio
 from typing import override
@@ -40,10 +43,18 @@ class FailingDicomStorage(FakeStorage):
 
     @override
     async def upload_dicom(self, study: DicomStudy, content: bytes) -> str:
-        raise RuntimeError("DICOM upload failed")
+        raise RuntimeError(self.__class__.__name__)
 
 
-class DelayedFailingDicomStorage(FailingDicomStorage):
+class FailingReportStorage(FakeStorage):
+    """Storage whose ``upload_dicom`` always raises synchronously."""
+
+    @override
+    async def upload_report(self, study: DicomStudy, content: bytes) -> str:
+        raise RuntimeError(self.__class__.__name__)
+
+
+class DelayedFailingDicomStorage(FakeStorage):
     """Storage whose ``upload_dicom`` raises after a simulated network delay.
 
     The delay lets sibling upload tasks finish first, which tests the
@@ -54,7 +65,7 @@ class DelayedFailingDicomStorage(FailingDicomStorage):
     @override
     async def upload_dicom(self, study: DicomStudy, content: bytes) -> str:
         await asyncio.sleep(0.01)
-        return await super().upload_dicom(study, content)
+        raise RuntimeError(self.__class__.__name__)
 
 
 class FailingMagicLinkStorage(FakeStorage):
@@ -62,7 +73,7 @@ class FailingMagicLinkStorage(FakeStorage):
 
     @override
     async def create_magic_link(self, study: DicomStudy) -> MagicLink:
-        raise RuntimeError("Magic link creation failed")
+        raise RuntimeError(self.__class__.__name__)
 
 
 class FakePdfToText(PdfToTextPort):
@@ -92,4 +103,4 @@ class FailingHumanization(FakeHumanization):
 
     @override
     async def humanize(self, report: str) -> bytes:
-        raise RuntimeError("Humanization failed")
+        raise RuntimeError(self.__class__.__name__)

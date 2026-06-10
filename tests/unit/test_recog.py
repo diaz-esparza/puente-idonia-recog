@@ -9,8 +9,8 @@ from puente.adapters.recog import RecogAdapter
 from puente.config import Settings
 
 
-class TestRecogAdapter:
-    """Tests for the Recog AI humanization adapter."""
+class TestRecogAdapterHappy:
+    """Basic tests for the Recog AI humanization adapter."""
 
     async def test_humanize_sends_correct_payload(
         self, respx_mock: respx.MockRouter, settings: Settings
@@ -27,6 +27,10 @@ class TestRecogAdapter:
         assert request.headers["x-api-key"] == "test-recog-key"
         body = orjson.loads(request.content)
         assert body["dictationReport"] == "clinical text"
+
+
+class TestRecogAdapterError:
+    """Error management tests for the Recog AI humanization adapter."""
 
     async def test_humanize_raises_on_http_error(
         self, respx_mock: respx.MockRouter, settings: Settings

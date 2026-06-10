@@ -16,8 +16,8 @@ def _make_study() -> DicomStudy:
     )
 
 
-class TestIdoniaAdapter:
-    """Tests for the Idonia medical storage adapter."""
+class TestIdoniaAdapterHappy:
+    """Basic tests for the Idonia medical storage adapter."""
 
     def test_decode_secret_strips_s2_prefix(self) -> None:
         adapter = IdoniaAdapter()
@@ -76,6 +76,10 @@ class TestIdoniaAdapter:
         assert link.url == "https://magic.test/99"
         assert link.pin == "1234"
         assert route.called
+
+
+class TestIdoniaAdapterError:
+    """Error management tests for the Idonia medical storage adapter."""
 
     async def test_upload_dicom_raises_on_http_error(
         self, respx_mock: respx.MockRouter, settings: Settings
