@@ -17,11 +17,13 @@ async def _pipeline_returns_error(
     medical_record: MedicalRecordUpload,
 ) -> None:
     with pytest.raises(httpx.HTTPStatusError):
-        _ = await api_client.post(
-            "/pipeline/run",
-            content=medical_record.model_dump_json(by_alias=False),
-            headers={"Content-Type": "application/json"},
-        )
+        _ = (
+            await api_client.post(
+                "/pipeline/run",
+                content=medical_record.model_dump_json(by_alias=False),
+                headers={"Content-Type": "application/json"},
+            )
+        ).raise_for_status()
 
 
 @pytest.mark.parametrize(
