@@ -100,7 +100,8 @@ lint.select = [
 lint.per-file-ignores."tests/**/*" = [
   "E402",
   "PLR2004",
-  "S",
+  "S101",
+  "S105",
 ]
 
 [tool.pyright]
