@@ -1,12 +1,12 @@
 # pyright: reportUnknownMemberType=false
 
 import base64
-import json
 import time
 from typing import cast, override
 
 import httpx
 import jwt
+import orjson
 from opentelemetry import trace
 from pydantic import SecretBytes, SecretStr, ValidationError
 
@@ -149,7 +149,7 @@ class IdoniaAdapter(MedicalStoragePort):
             ).raise_for_status()
             data = await response.aread()
         try:
-            parsed = cast(object, json.loads(data))
+            parsed = cast(object, orjson.loads(data))
             if isinstance(parsed, list):
                 items = cast(list[object], parsed)
                 n_items = len(items)
@@ -165,7 +165,7 @@ class IdoniaAdapter(MedicalStoragePort):
                 raise RuntimeError(f"Expected array of 1 item, got {n_items}")
             raise RuntimeError(f"Expected a list, got {parsed.__class__}")
 
-        except (ValidationError, json.JSONDecodeError, RuntimeError) as e:
+        except (ValidationError, orjson.JSONDecodeError, RuntimeError) as e:
             raise RuntimeError(
                 f"Unexpected Idonia magic link response: {data.decode()}"
             ) from e

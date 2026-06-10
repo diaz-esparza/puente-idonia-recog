@@ -59,9 +59,10 @@ scripts.puente = "puente.cli.main:app"
 [dependency-groups]
 dev = [
   "pyproject-fmt>=2.21.2",
-  "pyright>=1.1.409",
+  "pyright>=1.1.410",
   "pytest>=9.0.3",
   "pytest-asyncio>=1.3",
+  "respx>=0.23.1",
   "ruff>=0.11",
   "yamlfix>=1.19.1",
 ]
@@ -74,6 +75,7 @@ target-version = "py314"
 line-length = 79
 lint.select = [
   "A",
+  "ASYNC",
   "B",
   "C4",
   "D3",
@@ -82,6 +84,7 @@ lint.select = [
   "E",
   "ERA",
   "F",
+  "FAST",
   "I",
   "N",
   "PERF",
@@ -92,6 +95,13 @@ lint.select = [
   "SIM",
   "UP",
   "W",
+  "YTT",
+]
+lint.per-file-ignores."tests/**/*" = [
+  "E402",
+  "PLR2004",
+  "S101",
+  "S105",
 ]
 
 [tool.pyright]

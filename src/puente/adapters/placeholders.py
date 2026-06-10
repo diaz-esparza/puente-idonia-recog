@@ -22,5 +22,5 @@ class DummyHumanizationAdapter(ReportHumanizationPort):
             + "sino un parche temporal para pruebas"
         )
         _ = page.insert_text((72, 72), report, fontsize=12)
-        _logger.warning("mock_humanization")
+        _logger.warning("dummy_humanization")
         return document.tobytes()
