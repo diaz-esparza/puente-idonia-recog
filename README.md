@@ -76,7 +76,7 @@ Visor disponible en el Magic Link impreso al final de la demostración.
 ## Lo que hace este proyecto distinto
 
 - **Registro de auditoría con cadena de hashes** — cada acción verificable mediante encadenamiento de firmadas criptográficas. Protección de integridad por diseño. → [`src/puente/audit/`](./src/puente/audit/)
-- **Redacción de PII antes de salir a terceros** — el informe se anonimiza antes de llegar a Recog. → [`src/puente/adapters/redaction.py`](./src/puente/adapters/redaction.py)
+- **Anonimización de PII antes de salir a terceros** — el informe se anonimiza antes de llegar a Recog. → [`src/puente/adapters/redaction.py`](./src/puente/adapters/redaction.py)
 - **Observabilidad OpenTelemetry de extremo a extremo** — Idonia → Puente → Recog → Idonia, cada paso observable. → [`src/puente/telemetry.py`](./src/puente/telemetry.py)
 - **Arquitectura hexagonal** — dominio puro, adaptadores aislados, servicios reanudables. Tests unitarios sin red. → [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - **Idempotencia por fase** — si Recog cae a mitad, reintentas sin duplicar. Backoff exponencial con `tenacity`.
@@ -89,7 +89,7 @@ Visor disponible en el Magic Link impreso al final de la demostración.
 Dado que se manejan datos clínicos, este proyecto incluye:
 
 - **Rastro de auditoría con integridad y no-repudio**: cada operación se firma y encadena por medio de un hash criptográfico
-- **Redacción de PII antes de salir hacia terceros**: se minimiza la cantidad de información personalmente identificable (PII) que sale del puente, via una capa de saneamiento
+- **Anonimización de PII antes de salir hacia terceros**: se minimiza la cantidad de información personalmente identificable (PII) que sale del puente, via una capa de saneamiento
 - **Modelo de Amenaza documentado** (STRIDE)
 - **Aislamiento del ejecutable**, por medio de imágenes Docker con usuario rootless
 - **Observabilidad** de extremo a extremo

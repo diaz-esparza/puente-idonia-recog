@@ -46,7 +46,7 @@ def _print_phases(console: Console) -> None:
         + "[/dim]",
     )
     console.print(
-        "[bold]Fase IIa[/bold] — Redacción de PII "
+        "[bold]Fase IIa[/bold] — Anonimización de PII "
         + f"[dim]({settings.presidio_provider})[/dim]",
     )
     console.print(
