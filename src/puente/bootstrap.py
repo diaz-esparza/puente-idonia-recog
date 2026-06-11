@@ -4,7 +4,7 @@ from puente.adapters.idonia import IdoniaAdapter
 from puente.adapters.pdf_to_txt import PymupdfAdapter
 from puente.adapters.placeholders import (
     DummyHumanizationAdapter,
-    DummyPresidioAdapter,
+    DummyRedactionAdapter,
 )
 from puente.adapters.presidio import PresidioAdapter
 from puente.adapters.recog import RecogAdapter
@@ -21,7 +21,9 @@ def get_pipeline() -> BridgePipeline:
         else RecogAdapter()
     )
     pii_redaction_impl = (
-        DummyPresidioAdapter() if settings.presidio_mock else PresidioAdapter()
+        DummyRedactionAdapter()
+        if settings.presidio_mock
+        else PresidioAdapter()
     )
     return BridgePipeline(
         storage=IdoniaAdapter(),

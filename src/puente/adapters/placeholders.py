@@ -11,7 +11,7 @@ from puente.telemetry.getters import get_logger
 _logger = get_logger(__name__)
 
 
-class DummyPresidioAdapter(PiiRedactionPort):
+class DummyRedactionAdapter(PiiRedactionPort):
     """Identity pass-through that logs a warning.
 
     Not for use in production, as all PII goes through unmodified.

@@ -2,7 +2,7 @@
 
 import pytest
 
-from puente.adapters.placeholders import DummyPresidioAdapter
+from puente.adapters.placeholders import DummyRedactionAdapter
 from puente.adapters.presidio import PresidioAdapter
 
 _FIELDS_PII = [
@@ -40,12 +40,12 @@ _STRINGS_COMMON = [
 ]
 
 
-class TestDummyPresidioAdapter:
+class TestDummyRedactionAdapter:
     """Identity pass-through adapter tests."""
 
     @pytest.mark.parametrize("text", _STRINGS_MEDICAL + _STRINGS_COMMON)
     def test_returns_same_text(self, text: str) -> None:
-        adapter = DummyPresidioAdapter()
+        adapter = DummyRedactionAdapter()
         assert text == adapter.redact(text)
 
 
