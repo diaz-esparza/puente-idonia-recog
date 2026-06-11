@@ -36,7 +36,6 @@ def serve() -> None:
         "puente.api.app:app",
         host=settings.app_host,
         port=settings.app_port,
-        reload=settings.app_reload,
     )
 
 

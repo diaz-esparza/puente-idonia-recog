@@ -51,7 +51,6 @@ class Settings(BaseSettings):
 
     app_host: str = "127.0.0.1"
     app_port: int = Field(default=8000, gt=0, le=65535)
-    app_reload: bool = True
 
     version: str = version(__package__) if __package__ is not None else "dev"
 
