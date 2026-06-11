@@ -19,7 +19,11 @@ class DummyRedactionAdapter(PiiRedactionPort):
 
     @override
     def redact(self, text: str) -> str:
-        _logger.warning("dummy_redaction", text_length=len(text))
+        _logger.warning(
+            "dummy_redaction",
+            message="PII redaction bypassed in mock mode",
+            text_length=len(text),
+        )
         return text
 
 
@@ -39,5 +43,9 @@ class DummyHumanizationAdapter(ReportHumanizationPort):
             + "sino un parche temporal para pruebas"
         )
         _ = page.insert_text((72, 72), report, fontsize=12)
-        _logger.warning("dummy_humanization")
+        _logger.warning(
+            "dummy_humanization",
+            message="Mock adapter used for report humanization",
+            text_length=len(report),
+        )
         return document.tobytes()
