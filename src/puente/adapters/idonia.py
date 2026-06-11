@@ -1,5 +1,3 @@
-# pyright: reportUnknownMemberType=false
-
 import base64
 import time
 from typing import cast, override

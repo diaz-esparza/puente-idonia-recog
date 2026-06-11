@@ -21,6 +21,19 @@ class MedicalStoragePort(ABC):
         """Create magic link to access the study container."""
 
 
+class PiiRedactionPort(ABC):
+    """Outbound port for PII de-identification in clinical text
+    (e.g. Microsoft Presidio).
+
+    Runs *before* humanization so the external AI service never sees
+    personally identifiable information.
+    """
+
+    @abstractmethod
+    def redact(self, text: str) -> str:
+        """De-identify PII from clinical text. Returns de-identified text."""
+
+
 class ReportHumanizationPort(ABC):
     """Outbound port for external medical report humanization service
     (e.g. Recog AI).

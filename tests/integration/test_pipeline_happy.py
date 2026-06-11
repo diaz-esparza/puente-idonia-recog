@@ -7,6 +7,7 @@ from tests.support.data import build_simple_record
 from tests.support.fakes import (
     FakeHumanization,
     FakePdfToText,
+    FakePiiRedaction,
     FakeStorage,
 )
 
@@ -27,15 +28,22 @@ def humanization() -> FakeHumanization:
 
 
 @pytest.fixture
+def pii_redaction() -> FakePiiRedaction:
+    return FakePiiRedaction()
+
+
+@pytest.fixture
 def pipeline(
     storage: FakeStorage,
     pdf_to_text: FakePdfToText,
     humanization: FakeHumanization,
+    pii_redaction: FakePiiRedaction,
 ) -> BridgePipeline:
     return BridgePipeline(
         storage=storage,
         pdf_to_text=pdf_to_text,
         humanization=humanization,
+        pii_redaction=pii_redaction,
     )
 
 
