@@ -29,8 +29,6 @@ nlp_configuration:
       GPE: LOCATION
       ORG: ORGANIZATION
       ORGANIZATION: ORGANIZATION
-      DATE: DATE_TIME
-      TIME: DATE_TIME
 
     low_confidence_score_multiplier: 0.4
     low_score_entity_names:
@@ -48,6 +46,9 @@ nlp_configuration:
       - PRODUCT
       - QUANTITY
       - WORK_OF_ART
+      # Potentially important for a health diagnoses
+      - DATE
+      - TIME
 
 
 recognizer_registry:

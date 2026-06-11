@@ -37,6 +37,10 @@ _STRINGS_COMMON = [
     "Ha habido un incidente en la oficina.",
     "\r\nLa oveja camina por el monte.\n",
     "",
+    # We want to preserve dates and times for health diagnoses
+    "Hoy es día 15 de agosto de 2025",
+    "Los sucesos ocurrieron el 12/10/18.",
+    "Los sucesos ocurrieron el 12/10/2018.",
 ]
 
 
