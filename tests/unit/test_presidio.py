@@ -11,8 +11,8 @@ _FIELDS_PII = [
         ["Juan", "Martínez", "López"],
     ),
     (
-        "El paciente se llama Carlos, con DNI 23923401H. Vive en Ponferrada.",
-        ["Carlos", "239234012H", "Ponferrada"],
+        "El paciente se llama Carlos, con DNI 23923401C. Vive en Ponferrada.",
+        ["Carlos", "23923401C", "Ponferrada"],
     ),
     *[
         (f"El dato relevante: {i}.", [i])
