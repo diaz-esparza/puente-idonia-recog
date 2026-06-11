@@ -9,7 +9,7 @@ supported_languages:
 # supported_countries:
 #   - es
 
-default_score_threshold: 0
+default_score_threshold: 0.5
 
 
 nlp_configuration:
@@ -31,8 +31,7 @@ nlp_configuration:
       ORGANIZATION: ORGANIZATION
 
     low_confidence_score_multiplier: 0.4
-    low_score_entity_names:
-      - 
+    low_score_entity_names: []
     labels_to_ignore:
       - ORG
       - ORGANIZATION  # has many false positives
