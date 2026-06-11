@@ -42,8 +42,8 @@ def _print_patient_info(console: Console, study: DicomStudy) -> None:
 def _print_phases(console: Console) -> None:
     settings = get_settings()
     console.print(
-        "\n[bold]Fase I[/bold]  — Ingesta [dim](Subida de DICOM e informe)"
-        + "[/dim]",
+        "\n[bold]Fase I[/bold]   — Ingesta: subida de DICOM e informe "
+        + "[dim](Idonia)[/dim]",
     )
     console.print(
         "[bold]Fase IIa[/bold] — Anonimización de PII "
@@ -54,7 +54,8 @@ def _print_phases(console: Console) -> None:
         + f"[dim]({settings.humanized_provider})[/dim]",
     )
     console.print(
-        "[bold]Fase III[/bold] — Entrega [dim](Magic link)[/dim]\n",
+        "[bold]Fase III[/bold] — Entrega: generación de Magic Link "
+        + "[dim](Idonia)[/dim]\n",
     )
 
 
