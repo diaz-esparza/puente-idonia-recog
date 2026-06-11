@@ -5,7 +5,13 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import ClassVar, Self
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import (
+    Field,
+    FilePath,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -42,7 +48,7 @@ class Settings(BaseSettings):
     humanized_mock: bool = False
 
     presidio_mock: bool = False
-    presidio_config_file: Path = (
+    presidio_config_file: FilePath = (
         _PROJECT_ROOT / "config" / "presidio-analyzer.yaml"
     )
     presidio_anonymizer_operator: str = "replace"
