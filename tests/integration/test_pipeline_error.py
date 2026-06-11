@@ -9,9 +9,11 @@ from tests.support.fakes import (
     FailingDicomStorage,
     FailingHumanization,
     FailingMagicLinkStorage,
+    FailingPiiRedaction,
     FailingReportStorage,
     FakeHumanization,
     FakePdfToText,
+    FakePiiRedaction,
     FakeStorage,
 )
 
@@ -22,6 +24,7 @@ async def test_run_raises_when_magic_link_fails() -> None:
         storage=FailingMagicLinkStorage(),
         pdf_to_text=FakePdfToText(),
         humanization=FakeHumanization(),
+        pii_redaction=FakePiiRedaction(),
     )
     record = build_simple_record()
     with pytest.raises(RuntimeError, match=FailingMagicLinkStorage.__name__):
@@ -43,22 +46,50 @@ the program flow.
 
 
 @pytest.mark.parametrize(
-    ("storage_module", "humanization_module", "failing_module"),
+    (
+        "storage_module",
+        "humanization_module",
+        "pii_redaction_module",
+        "failing_module",
+    ),
     [
-        (FailingDicomStorage(), FakeHumanization(), FailingDicomStorage),
-        (FailingReportStorage(), FakeHumanization(), FailingReportStorage),
-        (FakeStorage(), FailingHumanization(), FailingHumanization),
+        (
+            FailingDicomStorage(),
+            FakeHumanization(),
+            FakePiiRedaction(),
+            FailingDicomStorage,
+        ),
+        (
+            FailingReportStorage(),
+            FakeHumanization(),
+            FakePiiRedaction(),
+            FailingReportStorage,
+        ),
+        (
+            FakeStorage(),
+            FailingHumanization(),
+            FakePiiRedaction(),
+            FailingHumanization,
+        ),
+        (
+            FakeStorage(),
+            FakeHumanization(),
+            FailingPiiRedaction(),
+            FailingPiiRedaction,
+        ),
     ],
 )
 async def test_run_magic_link_not_created_on_fast_upload_fails(
     storage_module: FakeStorage,
     humanization_module: FakeHumanization,
+    pii_redaction_module: FakePiiRedaction,
     failing_module: type,
 ) -> None:
     pipeline = BridgePipeline(
         storage=storage_module,
         pdf_to_text=FakePdfToText(),
         humanization=humanization_module,
+        pii_redaction=pii_redaction_module,
     )
     record = build_simple_record()
     with pytest.raises(RuntimeError, match=failing_module.__name__):
@@ -72,6 +103,7 @@ async def test_run_magic_link_created_on_slow_upload_fails() -> None:
         storage=storage,
         pdf_to_text=FakePdfToText(),
         humanization=FakeHumanization(),
+        pii_redaction=FakePiiRedaction(),
     )
     record = build_simple_record()
     with pytest.raises(RuntimeError, match=storage.__class__.__name__):

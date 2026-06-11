@@ -16,6 +16,7 @@ import respx
 
 # Environment safety: pre-seed before the first get_settings() call.
 os.environ["PUENTE_HUMANIZED_MOCK"] = "false"
+os.environ["PUENTE_PRESIDIO_MOCK"] = "false"
 os.environ["PUENTE_RECOG_API_KEY"] = "test-recog-key"
 os.environ["PUENTE_IDONIA_API_KEY"] = "test-idonia-key"
 os.environ["PUENTE_IDONIA_API_SECRET"] = (

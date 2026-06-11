@@ -2,6 +2,7 @@ import ipaddress
 import socket
 from functools import lru_cache
 from importlib.metadata import version
+from pathlib import Path
 from typing import ClassVar, Self
 
 from pydantic import Field, SecretStr, field_validator, model_validator
@@ -38,6 +39,10 @@ class Settings(BaseSettings):
     humanized_suffix: str = "_HUMANIZADO"
     humanized_mock: bool = False
 
+    presidio_mock: bool = False
+    presidio_config_file: Path = Path() / "config" / "presidio-analyzer.yaml"
+    presidio_anonymizer_operator: str = "replace"
+
     otel_service_name: str = "PUENTE"
     otel_environment: str = "dev"
     otel_log_level: str = "INFO"
@@ -53,6 +58,14 @@ class Settings(BaseSettings):
     @property
     def humanized_provider(self) -> str:
         return "Recog AI" if not self.humanized_mock else "Mock local"
+
+    @property
+    def presidio_provider(self) -> str:
+        return (
+            "Microsoft Presidio"
+            if not self.presidio_mock
+            else "Mock local (sin anonimización)"
+        )
 
     @model_validator(mode="after")
     def validate_recog_config(self) -> Self:

@@ -34,6 +34,7 @@ RUN --mount=type=cache,target=/app/.cache/uv,id=uv-deps,uid=${UID},gid=${GID} \
 COPY --chown=appuser:appgroup README.md .
 COPY --chown=appuser:appgroup src/ ./src/
 COPY --chown=appuser:appgroup tests/ ./tests/
+COPY --chown=appuser:appgroup config/ ./config/
 
 RUN --mount=type=cache,target=/app/.cache/uv,id=uv-deps,uid=${UID},gid=${GID} \
     uv sync --locked

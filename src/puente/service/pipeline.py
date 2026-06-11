@@ -10,6 +10,7 @@ from puente.domain.models import DicomStudy, MagicLink, MedicalRecordUpload
 from puente.domain.ports import (
     MedicalStoragePort,
     PdfToTextPort,
+    PiiRedactionPort,
     PipelinePort,
     ReportHumanizationPort,
 )
@@ -27,11 +28,13 @@ class BridgePipeline(PipelinePort):
         storage: MedicalStoragePort,
         pdf_to_text: PdfToTextPort,
         humanization: ReportHumanizationPort,
+        pii_redaction: PiiRedactionPort,
     ) -> None:
         settings = get_settings()
         self.__storage = storage
         self.__pdf_to_text = pdf_to_text
         self.__humanization = humanization
+        self.__pii_redaction = pii_redaction
         self.__humanized_suffix = settings.humanized_suffix
 
     @staticmethod
@@ -60,8 +63,15 @@ class BridgePipeline(PipelinePort):
         root_span = trace.get_current_span()
         with _tracer.start_as_current_span("phase_humanize"):
             decoded_report = self.__pdf_to_text.convert(report)
+
+            with _tracer.start_as_current_span("phase_redact"):
+                deidentified_report = self.__pii_redaction.redact(
+                    decoded_report
+                )
+                root_span.set_attribute("tasks.redact.generated", True)
+
             humanized_report = await self.__humanization.humanize(
-                decoded_report
+                deidentified_report
             )
             root_span.set_attribute("tasks.humanize.generated", True)
 

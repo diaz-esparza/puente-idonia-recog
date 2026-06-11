@@ -10,6 +10,7 @@ from puente.domain.models import DicomStudy, MagicLink
 from puente.domain.ports import (
     MedicalStoragePort,
     PdfToTextPort,
+    PiiRedactionPort,
     ReportHumanizationPort,
 )
 
@@ -103,4 +104,23 @@ class FailingHumanization(FakeHumanization):
 
     @override
     async def humanize(self, report: str) -> bytes:
+        raise RuntimeError(self.__class__.__name__)
+
+
+class FakePiiRedaction(PiiRedactionPort):
+    """In-memory PII redactor that returns a fixed de-identified string."""
+
+    def __init__(self, redacted: str = "de-identified text") -> None:
+        self.redacted = redacted
+
+    @override
+    def redact(self, text: str) -> str:
+        return self.redacted
+
+
+class FailingPiiRedaction(FakePiiRedaction):
+    """PII redactor that always raises."""
+
+    @override
+    def redact(self, text: str) -> str:
         raise RuntimeError(self.__class__.__name__)
