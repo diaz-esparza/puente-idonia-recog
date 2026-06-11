@@ -9,6 +9,7 @@ pytest plugin.
 import os
 from collections.abc import AsyncGenerator, Generator
 from unittest import mock
+from urllib.parse import urljoin
 
 import httpx
 import pytest
@@ -45,7 +46,7 @@ def _reset_caches() -> Generator[None]:
     get_pipeline.cache_clear()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def settings() -> Settings:
     """Fresh test settings with safe defaults."""
     return get_settings()
@@ -75,7 +76,7 @@ def medical_record() -> MedicalRecordUpload:
 
 
 @pytest.fixture(scope="module")
-async def api_client() -> AsyncGenerator[httpx.AsyncClient]:
+async def api_client(settings: Settings) -> AsyncGenerator[httpx.AsyncClient]:
     """Async HTTP client wired to the FastAPI ASGI app.
 
     The FastAPI app configures logs and traces at module level.
@@ -89,7 +90,7 @@ async def api_client() -> AsyncGenerator[httpx.AsyncClient]:
 
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
+        base_url=urljoin("http://test/", settings.api_root),
     ) as client:
         yield client
 

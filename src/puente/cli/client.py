@@ -2,6 +2,7 @@ import asyncio
 import ipaddress
 from types import TracebackType
 from typing import Self
+from urllib.parse import urljoin
 
 import httpx
 
@@ -46,7 +47,10 @@ class DemoClient:
         """Return the URL that points to the internal active API server."""
         settings = get_settings()
         host = cls.resolve_host(settings.app_host)
-        return f"http://{host}:{settings.app_port}"
+        return urljoin(
+            f"http://{host}:{settings.app_port}/",
+            settings.api_root,
+        )
 
     async def healthcheck(self) -> None:
         """Try persistently to obtain a healthcheck from the active server."""
@@ -55,9 +59,7 @@ class DemoClient:
             if i > 0:
                 await asyncio.sleep(5)
             try:
-                _ = (
-                    await self.__client.get("/health", timeout=10)
-                ).raise_for_status()
+                _ = (await self.__client.get("/health")).raise_for_status()
                 return
             except (
                 httpx.TimeoutException,
