@@ -3,18 +3,30 @@ import socket
 from functools import lru_cache
 from importlib.metadata import version
 from pathlib import Path
-from typing import ClassVar, Self
+from typing import Annotated, ClassVar, Self
 
 from pydantic import (
+    AfterValidator,
     Field,
     FilePath,
+    HttpUrl,
+    PositiveInt,
     SecretStr,
+    StringConstraints,
     field_validator,
     model_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
+
+
+def _validate_http_url(url: str) -> str:
+    return HttpUrl(url).unicode_string().rstrip("/")
+
+
+type _HttpUrlStr = Annotated[str, AfterValidator(_validate_http_url)]
+type _UpperCaseStr = Annotated[str, StringConstraints(to_upper=True)]
 
 
 class Settings(BaseSettings):
@@ -25,23 +37,20 @@ class Settings(BaseSettings):
         extra="forbid",
     )
 
-    idonia_base_url: str = "https://connect-staging.idonia.com"
+    idonia_base_url: _HttpUrlStr = "https://connect-staging.idonia.com"
     idonia_href_dicom: str = "dicom_hak_num3"
     idonia_href_report: str = "report_hak_num3"
-
-    idonia_jwt_margin_min: int = 5
-    idonia_jwt_ttl_min: int = 10
-
-    idonia_output_url: str = "https://demo.idonia.com/v"
-
+    idonia_jwt_margin_min: PositiveInt = 5
+    idonia_jwt_ttl_min: PositiveInt = 10
+    idonia_output_url: _HttpUrlStr = "https://demo.idonia.com/v"
     # Requires instantiation from .env file
     idonia_api_key: SecretStr = Field(init=False)
     idonia_api_secret: SecretStr = Field(init=False)
 
-    recog_url: str = (
+    recog_url: _HttpUrlStr = (
         "https://api.recog.es/relisten/dictation/process/report-results"
     )
-    recog_timeout_s: int = Field(default=60, gt=0)
+    recog_timeout_s: PositiveInt = 60
     recog_api_key: SecretStr = SecretStr("")
 
     humanized_suffix: str = "_HUMANIZADO"
@@ -55,7 +64,7 @@ class Settings(BaseSettings):
 
     otel_service_name: str = "PUENTE"
     otel_environment: str = "dev"
-    otel_log_level: str = "INFO"
+    otel_log_level: _UpperCaseStr = "INFO"
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
 
