@@ -13,6 +13,7 @@ from pydantic import (
     PositiveInt,
     SecretStr,
     StringConstraints,
+    ValidationInfo,
     field_validator,
     model_validator,
 )
@@ -111,7 +112,7 @@ class Settings(BaseSettings):
 
     @field_validator("app_host", "audit_app_host", mode="after")
     @classmethod
-    def normalize_app_host(cls, v: str) -> str:
+    def normalize_app_host(cls, v: str, info: ValidationInfo) -> str:
         try:
             _ = ipaddress.ip_address(v)
             return v
@@ -126,8 +127,9 @@ class Settings(BaseSettings):
             if isinstance(host, str):
                 return host
         prefix = cls.model_config.get("env_prefix", "")
+        field_name = info.field_name.upper() if info.field_name else "APP_HOST"
         raise ValueError(
-            f"{prefix}APP_HOST must be a valid IP or resolvable hostname, "
+            f"{prefix}{field_name} must be a valid IP or resolvable hostname, "
             + f"got: '{v}'"
         ) from None
 

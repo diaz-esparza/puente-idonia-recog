@@ -126,7 +126,7 @@ async def timestamp(signature: bytes) -> bytes | None:
         if isinstance(tsr_bytes, bytes):
             _logger.info("timestamp_success")
             return tsr_bytes
-        _logger.exception("timestamp_format_error")
+        _logger.error("timestamp_format_error")
     except TimestampingError:
         _logger.exception("timestamp_response_error")
     except Exception:

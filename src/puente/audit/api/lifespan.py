@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -14,7 +15,7 @@ _logger = get_logger(__name__)
 
 
 @contextlib.asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     worker = get_worker()
     worker_task = asyncio.create_task(worker.flush_loop())
     _logger.info("worker_started")

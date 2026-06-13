@@ -277,8 +277,22 @@ async def _inspect(console: Console) -> None:
     settings = get_settings()
     db_path = settings.audit_sqlite_file
 
+    if not db_path.exists():
+        console.print(
+            f"\n[yellow]Base de datos no encontrada: {db_path}[/yellow]\n"
+            "[dim]Ejecute el servidor de auditoría primero para crear registros.[/dim]\n"
+        )
+        return
+
     async with aiosqlite.connect(db_path) as db:
-        total = await _count_entries(db)
+        try:
+            total = await _count_entries(db)
+        except Exception:
+            console.print(
+                "\n[yellow]Tabla de auditoría no inicializada.[/yellow]\n"
+                "[dim]Ejecute el servidor de auditoría primero para crear registros.[/dim]\n"
+            )
+            return
         console.print(f"\n[bold]Entradas de auditoría totales:[/bold] {total}")
 
         if total == 0:

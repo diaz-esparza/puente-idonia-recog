@@ -61,6 +61,11 @@ class AuditWorker:
                     )
                 except Exception:
                     _logger.exception("audit_flush_error")
+                    # Restore failed bucket events to the front of the bucket
+                    for data_type, events in old_bucket.items():
+                        self.__bucket[data_type] = (
+                            events + self.__bucket[data_type]
+                        )
             else:
                 _logger.debug("audit_flush_empty")
 
@@ -89,8 +94,9 @@ class AuditWorker:
         self.__sequence += 1
 
     async def close(self) -> None:
-        db = await self.get_db()
-        await db.close()
+        if self._db is not None:
+            await self._db.close()
+            self._db = None
 
 
 @lru_cache(maxsize=1)
