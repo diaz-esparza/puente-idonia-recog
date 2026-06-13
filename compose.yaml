@@ -44,7 +44,7 @@ services:
     environment:
       PUENTE_AUDIT_APP_HOST: 0.0.0.0
       PUENTE_AUDIT_APP_PORT: '8001'
-      PUENTE_OTEL_ENDPOINT: null
+      PUENTE_OTEL_ENDPOINT:
     expose:
       - '8001'
     restart: unless-stopped
@@ -53,6 +53,7 @@ services:
       - private_keys:/app/.private/:rw
     networks:
       - internal
+      - default
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:0.153.0@sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
@@ -106,9 +107,11 @@ services:
       - internal
       - default
 
+
 volumes:
   private_keys:
     driver: local
+
 
 networks:
   internal:

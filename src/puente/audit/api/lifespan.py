@@ -22,3 +22,4 @@ async def lifespan(app: FastAPI):
     _ = worker_task.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker_task
+    await worker.close()

@@ -29,7 +29,7 @@ class AuditWorker:
 
     def __init__(self) -> None:
         settings = get_settings()
-        self.__flush_interval = settings.audit_flush_interval
+        self.__flush_interval_s = settings.audit_flush_interval_s
         self.__bucket: _BucketType = defaultdict(list)
         self.__previous_chain_hash: bytes | None = None
         self.__previous_tsr_hash: bytes | None = None
@@ -45,19 +45,22 @@ class AuditWorker:
 
     async def flush_loop(self) -> None:
         while True:
-            await asyncio.sleep(self.__flush_interval)
+            await asyncio.sleep(self.__flush_interval_s)
             old_bucket = self.__bucket
 
             if old_bucket:
                 self.__bucket = defaultdict(list)
-                await self._process_bucket(old_bucket)
-                _logger.debug(
-                    "audit_flush",
-                    **{
-                        f"{data_type.lower()}_count": len(data)
-                        for data_type, data in old_bucket.items()
-                    },
-                )
+                try:
+                    await self._process_bucket(old_bucket)
+                    _logger.debug(
+                        "audit_flush",
+                        **{
+                            f"{data_type.lower()}_count": len(data)
+                            for data_type, data in old_bucket.items()
+                        },
+                    )
+                except Exception:
+                    _logger.exception("audit_flush_error")
             else:
                 _logger.debug("audit_flush_empty")
 
@@ -69,7 +72,7 @@ class AuditWorker:
             previous_tsr_hash=self.__previous_tsr_hash,
             bucket_hash=sha256(bucket_bytes).digest(),
         )
-        chain_cbor = pki.to_canonical_bin(chain)
+        chain_cbor = pki.to_canonical_bin(chain.model_dump())
         signature = pki.keygen().sign(chain_cbor)
         tsr = await pki.timestamp(signature)
         record = AuditRecord(
@@ -84,6 +87,10 @@ class AuditWorker:
             sha256(tsr).digest() if tsr is not None else None
         )
         self.__sequence += 1
+
+    async def close(self) -> None:
+        db = await self.get_db()
+        await db.close()
 
 
 @lru_cache(maxsize=1)

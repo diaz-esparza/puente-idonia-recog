@@ -1,5 +1,5 @@
-# Application signing keys (public key only)
-.keys
+# Application signing keys
+.keys/**/*
 
 
 # Byte-compiled / optimized / DLL files

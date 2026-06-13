@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     recog_api_key: SecretStr = SecretStr("")
 
     humanized_suffix: str = "_HUMANIZADO"
-    humanized_mock: bool = False
+    humanized_mock: bool = True
 
     presidio_mock: bool = False
     presidio_config_file: FilePath = (
@@ -75,8 +75,8 @@ class Settings(BaseSettings):
         _PROJECT_ROOT / ".private" / "signing_key.pem"
     )
     audit_private_key_password: bytes | None = None
-    audit_tsa_url: _HttpUrlStr = "https://freetsa.org"
-    audit_flush_interval: PositiveInt = 5
+    audit_tsa_url: _HttpUrlStr = "https://freetsa.org/tsr"
+    audit_flush_interval_s: PositiveInt = 300
     audit_app_host: str = "127.0.0.1"
     audit_app_port: int = Field(default=8001, gt=0, le=65535)
 

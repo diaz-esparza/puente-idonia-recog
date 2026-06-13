@@ -20,7 +20,7 @@ exporters:
     endpoint: http://loki:3100/otlp
 
   otlp_http/audit:
-    endpoint: http://audit:8001/v1
+    endpoint: http://audit:8001
     tls:
       insecure: true
 

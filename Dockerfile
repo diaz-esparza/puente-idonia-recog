@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.title="Puente Idonia-Recog" \
 # Rootless improves security
 RUN groupadd --system --gid ${GID} appgroup \
     && useradd --system --uid ${UID} --gid appgroup --home-dir /app appuser \
-    && mkdir -p /app/.cache/uv \
+    && mkdir -p /app/.cache/uv /app/.private /app/.keys \
     && chown -R appuser:appgroup /app
 
 USER appuser

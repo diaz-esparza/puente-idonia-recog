@@ -2,14 +2,18 @@
 # pyright: reportMissingTypeStubs=false
 
 import asyncio
+import os
 from functools import lru_cache
 from pathlib import Path
 
 import cbor2
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from pyasn1.codec.der import encoder
-from rfc3161ng import RemoteTimestamper, TimestampingError
+from rfc3161ng import (
+    RemoteTimestamper,
+    TimestampingError,
+    encode_timestamp_response,  # pyright:ignore[reportUnknownVariableType]
+)
 
 from puente.config import get_settings
 from puente.telemetry.getters import get_logger
@@ -44,6 +48,7 @@ def _save_private_key(
                 encryption_algorithm=encryption_algorythm,
             )
         )
+    os.chmod(location, 0o600)
 
 
 def _save_derived_public_key(
@@ -103,17 +108,27 @@ async def timestamp(signature: bytes) -> bytes | None:
         loop on request (as the library uses the `requests` library).
         Performance improvements are possible through a port to httpx.
         - In real production, more efforts should be done to assure TSA
-        availability, like fallback providers or delay/retry logic.
+        availability, like fallback providers and delay/retry logic.
     """
     settings = get_settings()
     try:
-        tsa = RemoteTimestamper(settings.audit_tsa_url, hashname="sha256")
-        tsr_response = await asyncio.to_thread(tsa(signature, return_tsr=True))  # pyright: ignore[reportUnknownArgumentType, reportUnknownVariableType]
-        tsr_bytes = encoder.encode(tsr_response)  # pyright: ignore[reportUnknownArgumentType, reportUnknownVariableType]
+        tsa = RemoteTimestamper(
+            settings.audit_tsa_url,
+            hashname="sha256",
+            timeout=10,
+        )
+        tsr_response = await asyncio.to_thread(  # pyright: ignore[reportUnknownVariableType]
+            tsa,
+            signature,
+            return_tsr=True,
+        )
+        tsr_bytes = encode_timestamp_response(tsr_response)  # pyright: ignore[reportUnknownArgumentType, reportUnknownVariableType]
         if isinstance(tsr_bytes, bytes):
             _logger.info("timestamp_success")
             return tsr_bytes
         _logger.exception("timestamp_format_error")
     except TimestampingError:
         _logger.exception("timestamp_response_error")
+    except Exception:
+        _logger.exception("timestamp_unexpected_error")
     return None

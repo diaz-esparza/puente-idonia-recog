@@ -22,13 +22,21 @@ router = APIRouter(prefix="/v1")
 async def ingest_traces(request: Request, worker: DepWorker) -> dict[str, str]:
     body = await request.body()
     worker.put(body, AuditDataTypes.TRACES)
-    export_request = ExportTraceServiceRequest.FromString(body)
-    trace_count = sum(
-        len(scope.spans)
-        for resource in export_request.resource_spans
-        for scope in resource.scope_spans
-    )
-    _logger.debug("traces_ingested", trace_count=trace_count)
+    try:
+        export_request = ExportTraceServiceRequest.FromString(body)
+        trace_count = sum(
+            len(scope.spans)
+            for resource in export_request.resource_spans
+            for scope in resource.scope_spans
+        )
+        _logger.debug("traces_ingested", trace_count=trace_count)
+    except Exception:
+        _logger.debug(
+            "traces_ingested_raw",
+            content_type=request.headers.get("content-type"),
+            content_encoding=request.headers.get("content-encoding"),
+            body_len=len(body),
+        )
     return {}
 
 
@@ -36,13 +44,21 @@ async def ingest_traces(request: Request, worker: DepWorker) -> dict[str, str]:
 async def ingest_logs(request: Request, worker: DepWorker) -> dict[str, str]:
     body = await request.body()
     worker.put(body, AuditDataTypes.LOGS)
-    export_request = ExportLogsServiceRequest.FromString(body)
-    log_count = sum(
-        len(scope.log_records)
-        for resource in export_request.resource_logs
-        for scope in resource.scope_logs
-    )
-    _logger.debug("logs_ingested", log_count=log_count)
+    try:
+        export_request = ExportLogsServiceRequest.FromString(body)
+        log_count = sum(
+            len(scope.log_records)
+            for resource in export_request.resource_logs
+            for scope in resource.scope_logs
+        )
+        _logger.debug("logs_ingested", log_count=log_count)
+    except Exception:
+        _logger.debug(
+            "logs_ingested_raw",
+            content_type=request.headers.get("content-type"),
+            content_encoding=request.headers.get("content-encoding"),
+            body_len=len(body),
+        )
     return {}
 
 
