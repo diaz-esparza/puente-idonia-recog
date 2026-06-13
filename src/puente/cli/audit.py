@@ -27,10 +27,10 @@ def _print_banner(console: Console) -> None:
     console.print(
         Panel.fit(
             "[bold cyan]Puente Idonia-Recog[/bold cyan] "
-            + f"[bold yellow]v{settings.version}[/bold yellow]\n"
-            + "[dim]En el Camino de Santiago, cada sello atestigua un paso; "
-            + "en la auditoría, cada firma atestigua la verdad.[/dim]",
-            title="[bold green]Auditoría[/bold green]",
+            + f"[bold yellow]v{settings.version}[/bold yellow] "
+            + f"[bold cyan]AUDIT[/bold cyan]\n"
+            + "[dim]¡Todo por un pasaje seguro por las montañas![/dim]",
+            title="[bold green]Demo[/bold green]",
             border_style="green",
         ),
     )
