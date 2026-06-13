@@ -19,6 +19,11 @@ exporters:
   otlp_http/loki:
     endpoint: http://loki:3100/otlp
 
+  otlp_http/audit:
+    endpoint: http://audit:8001
+    tls:
+      insecure: true
+
 
 service:
   pipelines:
@@ -30,6 +35,7 @@ service:
         - batch
       exporters:
         - otlp_grpc/tempo
+        - otlp_http/audit
 
     logs:
       receivers:
@@ -38,3 +44,4 @@ service:
         - batch
       exporters:
         - otlp_http/loki
+        - otlp_http/audit
