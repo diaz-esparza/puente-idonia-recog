@@ -1,6 +1,7 @@
-from typing import ClassVar
+from datetime import UTC, datetime
+from typing import Annotated, ClassVar
 
-from pydantic import Base64Bytes, BaseModel, ConfigDict, Field
+from pydantic import Base64Bytes, BaseModel, ConfigDict, Field, PlainSerializer
 
 
 class StrictModel(BaseModel):
@@ -39,3 +40,22 @@ class MagicLink(StrictModel):
 
     url: str = Field(alias="URL")
     pin: str = Field(alias="PIN")
+
+
+class AuditChain(StrictModel):
+    sequence: int
+    previous_chain_hash: bytes | None
+    previous_tsr_hash: bytes | None
+    bucket_hash: bytes
+
+    ts: Annotated[datetime, PlainSerializer(datetime.isoformat)] = Field(
+        default_factory=lambda: datetime.now(UTC)
+    )
+    version: int = 1
+
+
+class AuditRecord(StrictModel):
+    chain_cbor: bytes
+    signature: bytes
+    tsr: bytes | None
+    bucket_zstd: bytes

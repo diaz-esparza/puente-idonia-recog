@@ -45,6 +45,17 @@ async def _async_healthcheck():
 
 
 @app.command()
+def serve_audit() -> None:
+    """Run the Puente Audit REST server."""
+    settings = get_settings()
+    uvicorn.run(
+        "puente.audit.api.app:app",
+        host=settings.audit_app_host,
+        port=settings.audit_app_port,
+    )
+
+
+@app.command()
 def healthcheck() -> None:
     """Run the health check probe against the API server."""
     try:

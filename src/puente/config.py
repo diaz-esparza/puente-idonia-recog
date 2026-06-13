@@ -10,6 +10,7 @@ from pydantic import (
     Field,
     FilePath,
     HttpUrl,
+    NewPath,
     PositiveInt,
     SecretStr,
     StringConstraints,
@@ -68,6 +69,17 @@ class Settings(BaseSettings):
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
 
+    audit_sqlite_file: FilePath | NewPath = _PROJECT_ROOT / "audit.db"
+    audit_public_key_file: Path = _PROJECT_ROOT / ".keys" / "signing_key.pub"
+    audit_private_key_file: Path = (
+        _PROJECT_ROOT / ".private" / "signing_key.pem"
+    )
+    audit_private_key_password: bytes | None = None
+    audit_tsa_url: _HttpUrlStr = "https://freetsa.org"
+    audit_flush_interval: PositiveInt = 5
+    audit_app_host: str = "127.0.0.1"
+    audit_app_port: int = Field(default=8001, gt=0, le=65535)
+
     app_host: str = "127.0.0.1"
     app_port: int = Field(default=8000, gt=0, le=65535)
 
@@ -96,7 +108,7 @@ class Settings(BaseSettings):
             )
         return self
 
-    @field_validator("app_host", mode="after")
+    @field_validator("app_host", "audit_app_host", mode="after")
     @classmethod
     def normalize_app_host(cls, v: str) -> str:
         try:
