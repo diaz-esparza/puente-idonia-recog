@@ -280,7 +280,8 @@ async def _inspect(console: Console) -> None:
     if not db_path.exists():
         console.print(
             f"\n[yellow]Base de datos no encontrada: {db_path}[/yellow]\n"
-            "[dim]Ejecute el servidor de auditoría primero para crear registros.[/dim]\n"
+            + "[dim]Por favor, ejecute el servidor de auditoría "
+            + "primero.[/dim]\n"
         )
         return
 
@@ -290,7 +291,8 @@ async def _inspect(console: Console) -> None:
         except Exception:
             console.print(
                 "\n[yellow]Tabla de auditoría no inicializada.[/yellow]\n"
-                "[dim]Ejecute el servidor de auditoría primero para crear registros.[/dim]\n"
+                + "[dim]Por favor, ejecute el servidor de auditoría "
+                + "primero.[/dim]\n"
             )
             return
         console.print(f"\n[bold]Entradas de auditoría totales:[/bold] {total}")
