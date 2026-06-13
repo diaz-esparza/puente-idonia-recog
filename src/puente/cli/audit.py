@@ -28,7 +28,7 @@ def _print_banner(console: Console) -> None:
         Panel.fit(
             "[bold cyan]Puente Idonia-Recog[/bold cyan] "
             + f"[bold yellow]v{settings.version}[/bold yellow] "
-            + f"[bold cyan]AUDIT[/bold cyan]\n"
+            + "[bold cyan]AUDIT[/bold cyan]\n"
             + "[dim]¡Todo por un pasaje seguro por las montañas![/dim]",
             title="[bold green]Demo[/bold green]",
             border_style="green",
