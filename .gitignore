@@ -1,5 +1,6 @@
 # Application signing keys
 .runtime/**/*
+.private/**/*
 
 
 # Byte-compiled / optimized / DLL files
