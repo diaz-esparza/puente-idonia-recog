@@ -8,6 +8,7 @@ from rich.console import Console
 
 from puente.config import get_settings
 
+from .audit import main as audit_inspect_main
 from .client import DemoClient
 from .demo import main as demo_main
 
@@ -62,3 +63,9 @@ def healthcheck() -> None:
         asyncio.run(_async_healthcheck())
     except Exception:
         raise typer.Exit(code=1) from None
+
+
+@app.command()
+def audit_inspect() -> None:
+    """Inspect audit records — count entries, verify chain, show details."""
+    audit_inspect_main(console)

@@ -10,7 +10,6 @@ from pydantic import (
     Field,
     FilePath,
     HttpUrl,
-    NewPath,
     PositiveInt,
     SecretStr,
     StringConstraints,
@@ -69,8 +68,10 @@ class Settings(BaseSettings):
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
 
-    audit_sqlite_file: FilePath | NewPath = _PROJECT_ROOT / "audit.db"
-    audit_public_key_file: Path = _PROJECT_ROOT / ".keys" / "signing_key.pub"
+    audit_sqlite_file: Path = _PROJECT_ROOT / ".runtime" / "audit.db"
+    audit_public_key_file: Path = (
+        _PROJECT_ROOT / ".runtime" / "signing_key.pub"
+    )
     audit_private_key_file: Path = (
         _PROJECT_ROOT / ".private" / "signing_key.pem"
     )

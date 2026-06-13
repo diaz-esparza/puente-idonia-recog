@@ -49,7 +49,8 @@ class AuditChain(StrictModel):
     bucket_hash: bytes
 
     ts: Annotated[datetime, PlainSerializer(datetime.isoformat)] = Field(
-        default_factory=lambda: datetime.now(UTC)
+        default_factory=lambda: datetime.now(UTC),
+        strict=False,  # To parse from ISO strings
     )
     version: int = 1
 

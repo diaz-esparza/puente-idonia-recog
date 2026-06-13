@@ -1,5 +1,5 @@
 # Application signing keys
-.keys/**/*
+.runtime/**/*
 
 
 # Byte-compiled / optimized / DLL files

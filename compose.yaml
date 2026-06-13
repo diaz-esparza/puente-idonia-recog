@@ -49,7 +49,7 @@ services:
       - '8001'
     restart: unless-stopped
     volumes:
-      - ./.keys/:/app/.keys/:rw
+      - ./.runtime/:/app/.runtime/:rw
       - private_keys:/app/.private/:rw
     networks:
       - internal

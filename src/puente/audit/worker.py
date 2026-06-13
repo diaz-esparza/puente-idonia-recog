@@ -21,7 +21,7 @@ class AuditDataTypes(StrEnum):
     TRACES = auto()
 
 
-type _BucketType = dict[AuditDataTypes, list[bytes]]
+type BucketType = dict[AuditDataTypes, list[bytes]]
 
 
 class AuditWorker:
@@ -30,7 +30,7 @@ class AuditWorker:
     def __init__(self) -> None:
         settings = get_settings()
         self.__flush_interval_s = settings.audit_flush_interval_s
-        self.__bucket: _BucketType = defaultdict(list)
+        self.__bucket: BucketType = defaultdict(list)
         self.__previous_chain_hash: bytes | None = None
         self.__previous_tsr_hash: bytes | None = None
         self.__sequence = 0
@@ -64,7 +64,7 @@ class AuditWorker:
             else:
                 _logger.debug("audit_flush_empty")
 
-    async def _process_bucket(self, bucket: _BucketType) -> None:
+    async def _process_bucket(self, bucket: BucketType) -> None:
         bucket_bytes = pki.to_canonical_bin(bucket)
         chain = AuditChain(
             sequence=self.__sequence,
