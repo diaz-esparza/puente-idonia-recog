@@ -48,6 +48,8 @@ nlp_configuration:
       # Potentially important for a health diagnoses
       - DATE
       - TIME
+      # Unmapped
+      - MISC
 
 
 recognizer_registry:
