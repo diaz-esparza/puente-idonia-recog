@@ -42,7 +42,7 @@ flowchart LR
 - Subida del DICOM y del PDF del informe quirúrgico
 
 ### Fase II — Humanización
-- **Capa de redacción PII/PHI** previa al envío a Recog (DNI, NHC, nombres, fechas) usando reglas específicas para identificadores españoles
+- **Capa de supresión PII/PHI** previa al envío a Recog (DNI, NHC, nombres, fechas) usando reglas específicas para identificadores españoles
 - Invocación de Recog para adaptar el informe a lenguaje empático y comprensible
 - Reinyección del informe humanizado en Idonia como `Informe para paciente`
 
@@ -132,7 +132,7 @@ compose.yaml
 src/puente/
 ├── domain/      # Modelos puros, sin I/O
 ├── services/    # Casos de uso: ingest, humanize, deliver
-├── adapters/    # Idonia, Recog, redacción PII
+├── adapters/    # Idonia, Recog, supresión PII
 ├── audit/       # Log con rastro de auditoría
 ├── api/         # FastAPI
 └── cli/         # Typer + Rich

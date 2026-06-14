@@ -1,4 +1,4 @@
-.PHONY: version demo up check test lint format typecheck
+.PHONY: version presidio-demo demo audit-inspect up format check lint typecheck test
 
 DOCKER := $(shell command -v docker 2>/dev/null)
 YAML_FILES := $(shell git ls-files '*.yaml' | paste -sd ' ' || true)
@@ -19,6 +19,9 @@ up:
 
 demo: up
 	docker compose exec -it puente bash -c "uv run puente demo"
+
+presidio-demo: up
+	uv run puente presidio-demo
 
 audit-inspect: up
 	docker compose exec -it audit bash -c "uv run puente audit-inspect"

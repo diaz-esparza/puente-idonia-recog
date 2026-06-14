@@ -8,7 +8,6 @@ from typing import Annotated, ClassVar, Self
 from pydantic import (
     AfterValidator,
     Field,
-    FilePath,
     HttpUrl,
     PositiveInt,
     SecretStr,
@@ -58,7 +57,7 @@ class Settings(BaseSettings):
     humanized_mock: bool = True
 
     presidio_mock: bool = False
-    presidio_config_file: FilePath = (
+    presidio_config_file: Path = (
         _PROJECT_ROOT / "config" / "presidio-analyzer.yaml"
     )
     presidio_anonymizer_operator: str = "replace"
@@ -68,6 +67,8 @@ class Settings(BaseSettings):
     otel_log_level: _UpperCaseStr = "INFO"
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
+
+    cli_dicom_path: Path = _PROJECT_ROOT / "data" / "dicom.tar.zst"
 
     audit_sqlite_file: Path = _PROJECT_ROOT / ".runtime" / "audit.db"
     audit_public_key_file: Path = (

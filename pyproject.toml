@@ -42,7 +42,9 @@ dependencies = [
   "cryptography>=48.0.1",
   "es-core-news-sm",
   "fastapi>=0.136.1",
+  "highdicom>=0.27",
   "httpx>=0.28.1",
+  "numpy>=2.4.6",
   "opentelemetry-api>=1.42.1",
   "opentelemetry-exporter-otlp>=1.42.1",
   "opentelemetry-instrumentation-fastapi>=0.63b1",
@@ -56,6 +58,7 @@ dependencies = [
   #
   "pydantic>=2.13.4",
   "pydantic-settings>=2.9.1",
+  "pydicom>=3.0.2",
   "pyjwt>=2.10.1",
   "pymupdf>=1.27.2.3",
   "rfc3161ng>=2.1.3",

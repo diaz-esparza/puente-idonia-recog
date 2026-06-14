@@ -43,6 +43,14 @@ def _add_otel_trace_context(
     return event_dict
 
 
+def configure_noop_logging() -> None:
+    structlog.configure(
+        logger_factory=structlog.ReturnLoggerFactory(),
+        processors=[],
+        cache_logger_on_first_use=False,
+    )
+
+
 def configure_logging() -> None:
     settings = get_settings()
     log_level = settings.otel_log_level

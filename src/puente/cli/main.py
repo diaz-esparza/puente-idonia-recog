@@ -11,6 +11,7 @@ from puente.config import get_settings
 from .audit import main as audit_inspect_main
 from .client import DemoClient
 from .demo import main as demo_main
+from .presidio_demo import main as presidio_demo_main
 
 app = typer.Typer(help="Puente Idonia-Recog CLI")
 console = Console()
@@ -69,3 +70,9 @@ def healthcheck() -> None:
 def audit_inspect() -> None:
     """Inspect audit records — count entries, verify chain, show details."""
     audit_inspect_main(console)
+
+
+@app.command()
+def presidio_demo() -> None:
+    """Run a standalone showcase of Presidio PII redaction."""
+    presidio_demo_main(console)

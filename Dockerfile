@@ -8,6 +8,11 @@ LABEL org.opencontainers.image.title="Puente Idonia-Recog" \
       org.opencontainers.image.version="0.1.0" \
       org.opencontainers.image.source="https://github.com/diaz-esparza/puente-idonia-recog"
 
+# Install C++ compiler for pyjpegls (highdicom dep)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 # Rootless improves security
 RUN groupadd --system --gid ${GID} appgroup \
     && useradd --system --uid ${UID} --gid appgroup --home-dir /app appuser \
@@ -35,6 +40,7 @@ COPY --chown=appuser:appgroup README.md .
 COPY --chown=appuser:appgroup src/ ./src/
 COPY --chown=appuser:appgroup tests/ ./tests/
 COPY --chown=appuser:appgroup config/ ./config/
+COPY --chown=appuser:appgroup data/ ./data/
 
 RUN --mount=type=cache,target=/app/.cache/uv,id=uv-deps,uid=${UID},gid=${GID} \
     uv sync --locked

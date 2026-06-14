@@ -20,6 +20,7 @@ from puente.audit import pki
 from puente.audit.worker import BucketType
 from puente.config import get_settings
 from puente.domain.models import AuditChain, AuditRecord
+from puente.telemetry.setup import configure_noop_logging
 
 
 def _print_banner(console: Console) -> None:
@@ -120,7 +121,7 @@ def _render_chain_panel(
         "Hash de TSR anterior", _format_hash(chain.previous_tsr_hash)
     )
     chain_table.add_row(
-        "Tamaño CBOR de cadena", f"{len(record.chain_cbor)} bytes"
+        "Tamaño de cadena CBOR", f"{len(record.chain_cbor)} bytes"
     )
     console.print(chain_table)
 
@@ -272,6 +273,7 @@ def _render_chains_summary(
 
 
 async def _inspect(console: Console) -> None:
+    configure_noop_logging()
     _print_banner(console)
 
     settings = get_settings()

@@ -5,8 +5,15 @@ possible to avoid duplication.
 """
 
 import base64
+import tarfile
+from compression import zstd
+from io import BytesIO
+from pathlib import Path
 
+import pydicom
 import pymupdf
+from pydicom.dataset import Dataset, FileMetaDataset
+from pydicom.uid import UID, ExplicitVRLittleEndian, generate_uid
 
 from puente.cli.mocks import build_demo_record as _build_demo_record
 from puente.domain.models import DicomStudy, MedicalRecordUpload
@@ -37,6 +44,81 @@ def build_multipage_pdf() -> bytes:
 def build_simple_dicom() -> bytes:
     """Minimal fake DICOM binary for tests."""
     return b"fake-dicom-binary"
+
+
+def build_minimal_dicom_file(path: Path) -> None:
+    """Write a minimal valid DICOM file to *path* for unit tests."""
+    ds = Dataset()
+    ds.PatientName = "Test^Patient"
+    ds.PatientID = "PT-001"
+    ds.AccessionNumber = "ACC-001"
+    ds.StudyDescription = "Test Study"
+    ds.StudyInstanceUID = generate_uid()
+    ds.SeriesInstanceUID = generate_uid()
+    sop_class_uid = UID("1.2.840.10008.5.1.4.1.1.2")
+    ds.SOPClassUID = sop_class_uid
+    ds.SOPInstanceUID = generate_uid()
+    ds.Modality = "CT"
+    ds.Rows = 2
+    ds.Columns = 2
+    ds.SamplesPerPixel = 1
+    ds.PhotometricInterpretation = "MONOCHROME2"
+    ds.BitsAllocated = 8
+    ds.BitsStored = 8
+    ds.HighBit = 7
+    ds.PixelRepresentation = 0
+    ds.PixelData = b"\x00" * 4
+    ds.AcquisitionDate = "20240101"
+    ds.AcquisitionTime = "120000"
+
+    file_meta = FileMetaDataset()
+    file_meta.MediaStorageSOPClassUID = sop_class_uid
+    file_meta.MediaStorageSOPInstanceUID = ds.SOPInstanceUID
+    file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    ds.file_meta = file_meta
+    pydicom.dcmwrite(str(path), ds, enforce_file_format=True)
+
+
+def build_minimal_dicom_zst(path: Path, count: int = 2) -> None:
+    """Write a .tar.zst with *count* minimal DICOM files to *path*."""
+    tar_buf = BytesIO()
+    with tarfile.open(fileobj=tar_buf, mode="w") as tar:
+        for i in range(count):
+            dcm_buf = BytesIO()
+            ds = Dataset()
+            ds.PatientName = "Test^Patient"
+            ds.PatientID = f"PT-{i:03d}"
+            ds.AccessionNumber = f"ACC-{i:03d}"
+            ds.StudyDescription = "Test Study"
+            ds.StudyInstanceUID = generate_uid()
+            ds.SeriesInstanceUID = generate_uid()
+            sop_class_uid = UID("1.2.840.10008.5.1.4.1.1.2")
+            ds.SOPClassUID = sop_class_uid
+            ds.SOPInstanceUID = generate_uid()
+            ds.Modality = "CT"
+            ds.Rows = 2
+            ds.Columns = 2
+            ds.SamplesPerPixel = 1
+            ds.PhotometricInterpretation = "MONOCHROME2"
+            ds.BitsAllocated = 8
+            ds.BitsStored = 8
+            ds.HighBit = 7
+            ds.PixelRepresentation = 0
+            ds.PixelData = b"\x00" * 4
+            file_meta = FileMetaDataset()
+            file_meta.MediaStorageSOPClassUID = sop_class_uid
+            file_meta.MediaStorageSOPInstanceUID = ds.SOPInstanceUID
+            file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+            ds.file_meta = file_meta
+            pydicom.dcmwrite(dcm_buf, ds, enforce_file_format=True)
+            info = tarfile.TarInfo(name=f"slice{i}.dcm")
+            info.size = len(dcm_buf.getvalue())
+            dcm_buf.seek(0)
+            tar.addfile(info, dcm_buf)
+
+    tar_buf.seek(0)
+    path.write_bytes(zstd.compress(tar_buf.read()))
 
 
 def build_simple_record(
