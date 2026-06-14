@@ -5,7 +5,6 @@ These helpers are slated for removal once the project migrates to
 proper pytest-based fixtures and integration tests.
 """
 
-import base64
 from functools import lru_cache
 
 import pymupdf
@@ -30,8 +29,8 @@ def build_demo_record() -> MedicalRecordUpload:
     dicom_file = build_enhanced_mr(datasets)
     return MedicalRecordUpload(
         study=study,
-        report_file=base64.b64encode(report_pdf),
-        dicom_file=base64.b64encode(dicom_file),
+        report_file=report_pdf,
+        dicom_file=dicom_file,
     )
 
 

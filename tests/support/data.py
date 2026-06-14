@@ -4,7 +4,6 @@ Re-uses the production mock generators from ``puente.cli.mocks`` whenever
 possible to avoid duplication.
 """
 
-import base64
 import tarfile
 from compression import zstd
 from io import BytesIO
@@ -142,6 +141,6 @@ def build_simple_record(
     dicom_file = build_simple_dicom()
     return MedicalRecordUpload(
         study=study,
-        report_file=base64.b64encode(report_pdf),
-        dicom_file=base64.b64encode(dicom_file),
+        report_file=report_pdf,
+        dicom_file=dicom_file,
     )

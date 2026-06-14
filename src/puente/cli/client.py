@@ -72,11 +72,27 @@ class DemoClient:
         ) from source_exception
 
     async def run_pipeline(self, record: MedicalRecordUpload) -> MagicLink:
-        """Send a medical record to the running API server."""
+        """Send a medical record to the running API server via form upload."""
         response = (
             await self.__client.post(
-                "/pipeline/run",
-                json=record.model_dump(mode="json", by_alias=False),
+                "/pipeline/run/form",
+                data={
+                    "dicom_study_json": record.study.model_dump_json(
+                        by_alias=False
+                    ),
+                },
+                files={
+                    "report_file": (
+                        "report.pdf",
+                        record.report_file,
+                        "application/pdf",
+                    ),
+                    "dicom_file": (
+                        "study.dcm",
+                        record.dicom_file,
+                        "application/dicom",
+                    ),
+                },
             )
         ).raise_for_status()
         return MagicLink.model_validate(response.json())

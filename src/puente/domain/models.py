@@ -1,7 +1,27 @@
+import base64
 from datetime import UTC, datetime
 from typing import Annotated, ClassVar
 
-from pydantic import Base64Bytes, BaseModel, ConfigDict, Field, PlainSerializer
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    PlainSerializer,
+)
+
+
+def _parse_bytes_or_b64(data: bytes | str) -> bytes:
+    if isinstance(data, bytes):
+        return data
+    return base64.b64decode(data)
+
+
+type BytesOrBase64 = Annotated[
+    bytes,
+    BeforeValidator(_parse_bytes_or_b64),
+    PlainSerializer(base64.b64encode),
+]
 
 
 class StrictModel(BaseModel):
@@ -30,9 +50,8 @@ class MedicalRecordUpload(StrictModel):
     """Aggregate root representing the complete patient upload data."""
 
     study: DicomStudy
-    # We need non-strict fields because we coerce from b64 strings
-    report_file: Base64Bytes = Field(strict=False)
-    dicom_file: Base64Bytes = Field(strict=False)
+    report_file: BytesOrBase64
+    dicom_file: BytesOrBase64
 
 
 class MagicLink(StrictModel):
