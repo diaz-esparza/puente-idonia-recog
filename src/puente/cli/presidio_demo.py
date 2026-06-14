@@ -44,7 +44,7 @@ def _build_pii_table(
     )
     table.add_column("Tipo", style="dim", width=12)
     table.add_column("Original", style="white")
-    table.add_column("Redactado", style="cyan")
+    table.add_column("Anonimizado", style="cyan")
     for label, original, redacted in rows:
         table.add_row(label, original, redacted)
     return table
