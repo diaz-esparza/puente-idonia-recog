@@ -8,11 +8,6 @@ LABEL org.opencontainers.image.title="Puente Idonia-Recog" \
       org.opencontainers.image.version="0.1.0" \
       org.opencontainers.image.source="https://github.com/diaz-esparza/puente-idonia-recog"
 
-# Install C++ compiler for pyjpegls (highdicom dep)
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends g++ \
-    && rm -rf /var/lib/apt/lists/*
-
 # Rootless improves security
 RUN groupadd --system --gid ${GID} appgroup \
     && useradd --system --uid ${UID} --gid appgroup --home-dir /app appuser \
