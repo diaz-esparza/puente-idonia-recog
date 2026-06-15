@@ -6,6 +6,8 @@ Exceptions raise self.__class__.__name__ to identify its source class.
 import asyncio
 from typing import override
 
+from pydantic import SecretStr
+
 from puente.domain.models import DicomStudy, MagicLink
 from puente.domain.ports import (
     MedicalStoragePort,
@@ -22,6 +24,7 @@ class FakeStorage(MedicalStoragePort):
         self.uploads: list[tuple[str, DicomStudy, bytes]] = []
         self.magic_link = MagicLink(URL="https://fake.test/123", PIN="9999")
         self.magic_requested = False
+        self.last_password: SecretStr | None = None
 
     @override
     async def upload_dicom(self, study: DicomStudy, content: bytes) -> str:
@@ -34,8 +37,13 @@ class FakeStorage(MedicalStoragePort):
         return "fake-report-id"
 
     @override
-    async def create_magic_link(self, study: DicomStudy) -> MagicLink:
+    async def create_magic_link(
+        self,
+        study: DicomStudy,
+        password: SecretStr | None,
+    ) -> MagicLink:
         self.magic_requested = True
+        self.last_password = password
         return self.magic_link
 
 
@@ -73,7 +81,11 @@ class FailingMagicLinkStorage(FakeStorage):
     """Storage whose ``create_magic_link`` always raises."""
 
     @override
-    async def create_magic_link(self, study: DicomStudy) -> MagicLink:
+    async def create_magic_link(
+        self,
+        study: DicomStudy,
+        password: SecretStr | None,
+    ) -> MagicLink:
         raise RuntimeError(self.__class__.__name__)
 
 

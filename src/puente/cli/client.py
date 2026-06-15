@@ -73,14 +73,16 @@ class DemoClient:
 
     async def run_pipeline(self, record: MedicalRecordUpload) -> MagicLink:
         """Send a medical record to the running API server via form upload."""
+        data: dict[str, str] = {
+            "dicom_study_json": record.study.model_dump_json(by_alias=False),
+        }
+        if record.password is not None:
+            data["password"] = record.password.get_secret_value()
+
         response = (
             await self.__client.post(
                 "/pipeline/run/form",
-                data={
-                    "dicom_study_json": record.study.model_dump_json(
-                        by_alias=False
-                    ),
-                },
+                data=data,
                 files={
                     "report_file": (
                         "report.pdf",

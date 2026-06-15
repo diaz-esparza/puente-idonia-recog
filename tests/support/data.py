@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pydicom
 import pymupdf
+from pydantic import SecretStr
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.uid import UID, ExplicitVRLittleEndian, generate_uid
 
@@ -126,6 +127,7 @@ def build_simple_record(
     accession_number: str = "ACC-2024-001",
     study_description: str = "Chest CT",
     report_text: str = "Original clinical report text.",
+    password: SecretStr | None = None,
 ) -> MedicalRecordUpload:
     """Create a minimal ``MedicalRecordUpload`` for unit tests.
 
@@ -143,4 +145,5 @@ def build_simple_record(
         study=study,
         report_file=report_pdf,
         dicom_file=dicom_file,
+        password=password,
     )

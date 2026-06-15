@@ -4,6 +4,7 @@ import asyncio
 
 import httpx
 import typer
+from pydantic import SecretStr
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -60,11 +61,20 @@ def _print_phases(console: Console) -> None:
     )
 
 
-def _print_result(console: Console, magic_link: MagicLink) -> None:
+def _print_result(
+    console: Console,
+    magic_link: MagicLink,
+    password: SecretStr | None,
+) -> None:
     settings = get_settings()
     table = Table(show_header=False, box=None)
     table.add_row("URL", f"{settings.idonia_output_url}/{magic_link.url}")
     table.add_row("PIN", f"[bold]{magic_link.pin}[/bold]")
+    if password is not None:
+        table.add_row(
+            "Contraseña",
+            f"[bold]{password.get_secret_value()}[/bold]",
+        )
 
     console.print(
         Panel(
@@ -121,4 +131,4 @@ def main(console: Console) -> None:
         console.print(f"\n[bold red]Error genérico:[/bold red] {exc}")
         raise typer.Exit(code=1) from exc
 
-    _print_result(console, magic_link)
+    _print_result(console, magic_link, record.password)

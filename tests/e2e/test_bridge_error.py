@@ -9,40 +9,8 @@ import httpx
 import pytest
 
 from puente.domain.models import MedicalRecordUpload
+from tests.e2e.common import post_pipeline
 from tests.support.mocks import IdoniaMock, RecogMock
-
-
-async def _post_pipeline(
-    api_client: httpx.AsyncClient,
-    endpoint: str,
-    medical_record: MedicalRecordUpload,
-) -> httpx.Response:
-    if endpoint == "/pipeline/run/form":
-        return await api_client.post(
-            endpoint,
-            data={
-                "dicom_study_json": medical_record.study.model_dump_json(
-                    by_alias=False
-                ),
-            },
-            files={
-                "report_file": (
-                    "report.pdf",
-                    medical_record.report_file,
-                    "application/pdf",
-                ),
-                "dicom_file": (
-                    "study.dcm",
-                    medical_record.dicom_file,
-                    "application/dicom",
-                ),
-            },
-        )
-    return await api_client.post(
-        endpoint,
-        content=medical_record.model_dump_json(by_alias=False),
-        headers={"Content-Type": "application/json"},
-    )
 
 
 async def _pipeline_returns_error(
@@ -52,7 +20,7 @@ async def _pipeline_returns_error(
 ) -> None:
     with pytest.raises(httpx.HTTPStatusError):
         _ = (
-            await _post_pipeline(api_client, endpoint, medical_record)
+            await post_pipeline(api_client, endpoint, medical_record)
         ).raise_for_status()
 
 

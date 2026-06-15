@@ -110,7 +110,10 @@ class BridgePipeline(PipelinePort):
                 span.set_attribute("tasks.patient_folder_created", True)
 
                 with _tracer.start_as_current_span("phase_deliver"):
-                    magic_link = await self.__storage.create_magic_link(study)
+                    magic_link = await self.__storage.create_magic_link(
+                        study,
+                        record.password,
+                    )
                 span.set_attribute("tasks.magic_link_created", True)
 
                 _ = await asyncio.gather(*pending)

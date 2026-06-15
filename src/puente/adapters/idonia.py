@@ -1,5 +1,6 @@
 import base64
 import time
+from hashlib import sha256
 from typing import cast, override
 
 import httpx
@@ -128,13 +129,30 @@ class IdoniaAdapter(MedicalStoragePort):
         """Build container route according to specifications."""
         return "/".join([study.patient_id, study.accession_number])
 
+    @staticmethod
+    def _serialize_password(password: SecretStr | None) -> str:
+        """Hash a magic-link password the way Idonia expects.
+
+        Idonia requires the lowercase hexadecimal digest of the
+        SHA256 of the plain password, encoded as base64.
+
+        An empty string is sent when no password is configured.
+        """
+        if password is None:
+            return ""
+        hash_hex = sha256(password.get_secret_value().encode()).hexdigest()
+        return base64.b64encode(hash_hex.encode()).decode()
+
     @override
-    async def create_magic_link(self, study: DicomStudy) -> MagicLink:
+    async def create_magic_link(
+        self,
+        study: DicomStudy,
+        password: SecretStr | None,
+    ) -> MagicLink:
         route = self._get_container_route(study)
         params = {
             "route": route,
-            # TODO feature: Add password protection
-            "password": "",
+            "password": self._serialize_password(password),
             "expired_creation_mode": "create",
         }
         with Timer() as timer:

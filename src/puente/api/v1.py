@@ -2,6 +2,7 @@ import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from pydantic import SecretStr
 
 from puente.bootstrap import get_pipeline
 from puente.config import Settings, get_settings
@@ -31,6 +32,7 @@ async def pipeline_run_form(
     report_file: Annotated[UploadFile, File()],
     dicom_file: Annotated[UploadFile, File()],
     pipeline: DepPipeline,
+    password: Annotated[SecretStr | None, Form()] = None,
 ) -> MagicLink:
     report_file_bytes, dicom_file_bytes = await asyncio.gather(
         report_file.read(), dicom_file.read()
@@ -40,6 +42,7 @@ async def pipeline_run_form(
         study=study,
         report_file=report_file_bytes,
         dicom_file=dicom_file_bytes,
+        password=password,
     )
     return await pipeline_run(record, pipeline)
 

@@ -8,6 +8,8 @@ from pydantic import (
     ConfigDict,
     Field,
     PlainSerializer,
+    SecretStr,
+    field_validator,
 )
 
 
@@ -52,6 +54,14 @@ class MedicalRecordUpload(StrictModel):
     study: DicomStudy
     report_file: BytesOrBase64
     dicom_file: BytesOrBase64
+    password: SecretStr | None = None
+
+    @field_validator("password", mode="after")
+    @classmethod
+    def _nullify_empty_password(
+        cls, value: SecretStr | None
+    ) -> SecretStr | None:
+        return value or None
 
 
 class MagicLink(StrictModel):
