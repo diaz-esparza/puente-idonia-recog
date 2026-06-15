@@ -13,6 +13,7 @@ from pydantic import (
     PositiveInt,
     SecretStr,
     StringConstraints,
+    ValidationInfo,
     field_validator,
     model_validator,
 )
@@ -54,7 +55,7 @@ class Settings(BaseSettings):
     recog_api_key: SecretStr = SecretStr("")
 
     humanized_suffix: str = "_HUMANIZADO"
-    humanized_mock: bool = False
+    humanized_mock: bool = True
 
     presidio_mock: bool = False
     presidio_config_file: FilePath = (
@@ -67,6 +68,19 @@ class Settings(BaseSettings):
     otel_log_level: _UpperCaseStr = "INFO"
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
+
+    audit_sqlite_file: Path = _PROJECT_ROOT / ".runtime" / "audit.db"
+    audit_public_key_file: Path = (
+        _PROJECT_ROOT / ".runtime" / "signing_key.pub"
+    )
+    audit_private_key_file: Path = (
+        _PROJECT_ROOT / ".private" / "signing_key.pem"
+    )
+    audit_private_key_password: bytes | None = None
+    audit_tsa_url: _HttpUrlStr = "https://freetsa.org/tsr"
+    audit_flush_interval_s: PositiveInt = 300
+    audit_app_host: str = "127.0.0.1"
+    audit_app_port: int = Field(default=8001, gt=0, le=65535)
 
     app_host: str = "127.0.0.1"
     app_port: int = Field(default=8000, gt=0, le=65535)
@@ -96,9 +110,9 @@ class Settings(BaseSettings):
             )
         return self
 
-    @field_validator("app_host", mode="after")
+    @field_validator("app_host", "audit_app_host", mode="after")
     @classmethod
-    def normalize_app_host(cls, v: str) -> str:
+    def normalize_app_host(cls, v: str, info: ValidationInfo) -> str:
         try:
             _ = ipaddress.ip_address(v)
             return v
@@ -113,8 +127,9 @@ class Settings(BaseSettings):
             if isinstance(host, str):
                 return host
         prefix = cls.model_config.get("env_prefix", "")
+        field_name = info.field_name.upper() if info.field_name else "APP_HOST"
         raise ValueError(
-            f"{prefix}APP_HOST must be a valid IP or resolvable hostname, "
+            f"{prefix}{field_name} must be a valid IP or resolvable hostname, "
             + f"got: '{v}'"
         ) from None
 

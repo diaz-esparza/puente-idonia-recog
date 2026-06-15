@@ -20,6 +20,9 @@ up:
 demo: up
 	docker compose exec -it puente bash -c "uv run puente demo"
 
+audit-inspect: up
+	docker compose exec -it audit bash -c "uv run puente audit-inspect"
+
 format:
 	uv run ruff check --fix --silent --exit-zero
 	uv run ruff format src tests

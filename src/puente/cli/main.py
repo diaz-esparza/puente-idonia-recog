@@ -8,6 +8,7 @@ from rich.console import Console
 
 from puente.config import get_settings
 
+from .audit import main as audit_inspect_main
 from .client import DemoClient
 from .demo import main as demo_main
 
@@ -45,9 +46,26 @@ async def _async_healthcheck():
 
 
 @app.command()
+def serve_audit() -> None:
+    """Run the Puente Audit REST server."""
+    settings = get_settings()
+    uvicorn.run(
+        "puente.audit.api.app:app",
+        host=settings.audit_app_host,
+        port=settings.audit_app_port,
+    )
+
+
+@app.command()
 def healthcheck() -> None:
     """Run the health check probe against the API server."""
     try:
         asyncio.run(_async_healthcheck())
     except Exception:
         raise typer.Exit(code=1) from None
+
+
+@app.command()
+def audit_inspect() -> None:
+    """Inspect audit records — count entries, verify chain, show details."""
+    audit_inspect_main(console)
