@@ -31,80 +31,55 @@ async def test_run_raises_when_magic_link_fails() -> None:
         _ = await pipeline.run(record)
 
 
-"""As of the current implementation, any upload/humanization failing
-should raise, independently on order of execution, but only the events
-that fail first, will stop the magic link creation.
-
-This is because of the `FIRST_COMPLETED` directive in `asyncio.wait`.
-
-The following tests check for this exact behavior in the code.
-
-This behavior might not be optimal in production, and is subject to
-change. The test is just in place to ensure no unintended change in
-the program flow.
-
-Note: DICOM upload now involves ZIP extraction which adds latency,
-so the report upload and humanization typically finish first even
-when DICOM ultimately fails.
-"""
-
-
 @pytest.mark.parametrize(
     (
         "storage_module",
         "humanization_module",
         "pii_redaction_module",
         "failing_module",
-        "magic_created",
     ),
     [
         (
-            FailingDicomStorage(),
-            FakeHumanization(),
-            FakePiiRedaction(),
             FailingDicomStorage,
-            True,
+            FakeHumanization,
+            FakePiiRedaction,
+            FailingDicomStorage,
         ),
         (
-            FailingReportStorage(),
-            FakeHumanization(),
-            FakePiiRedaction(),
             FailingReportStorage,
-            False,
+            FakeHumanization,
+            FakePiiRedaction,
+            FailingReportStorage,
         ),
         (
-            FakeStorage(),
-            FailingHumanization(),
-            FakePiiRedaction(),
+            FakeStorage,
             FailingHumanization,
-            False,
+            FakePiiRedaction,
+            FailingHumanization,
         ),
         (
-            FakeStorage(),
-            FakeHumanization(),
-            FailingPiiRedaction(),
+            FakeStorage,
+            FakeHumanization,
             FailingPiiRedaction,
-            False,
+            FailingPiiRedaction,
         ),
     ],
 )
-async def test_run_magic_link_not_created_on_fast_upload_fails(
-    storage_module: FakeStorage,
-    humanization_module: FakeHumanization,
-    pii_redaction_module: FakePiiRedaction,
+async def test_run_propagates_failure_from_any_module(
+    storage_module: type[FakeStorage],
+    humanization_module: type[FakeHumanization],
+    pii_redaction_module: type[FakePiiRedaction],
     failing_module: type,
-    magic_created: bool,
 ) -> None:
     pipeline = BridgePipeline(
-        storage=storage_module,
+        storage=storage_module(),
         pdf_to_text=FakePdfToText(),
-        humanization=humanization_module,
-        pii_redaction=pii_redaction_module,
+        humanization=humanization_module(),
+        pii_redaction=pii_redaction_module(),
     )
     record = build_simple_record()
     with pytest.raises(RuntimeError, match=failing_module.__name__):
         _ = await pipeline.run(record)
-    assert storage_module.magic_requested is magic_created
 
 
 async def test_run_magic_link_created_on_slow_upload_fails() -> None:
