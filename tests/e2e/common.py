@@ -29,7 +29,7 @@ async def post_pipeline(
                 ),
                 "dicom_file": (
                     "study.dcm",
-                    medical_record.dicom_file,
+                    medical_record.dicom_zip,
                     "application/dicom",
                 ),
             },

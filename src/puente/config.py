@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     otel_endpoint: str | None = None
     otel_connect_insecurely: bool = False
 
-    cli_dicom_path: Path = _PROJECT_ROOT / "data" / "dicom.tar.zst"
+    cli_dicom_path: Path = _PROJECT_ROOT / "data" / "dicom.zip"
 
     audit_sqlite_file: Path = _PROJECT_ROOT / ".runtime" / "audit.db"
     audit_public_key_file: Path = (

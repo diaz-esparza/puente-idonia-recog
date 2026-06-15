@@ -42,6 +42,10 @@ The following tests check for this exact behavior in the code.
 This behavior might not be optimal in production, and is subject to
 change. The test is just in place to ensure no unintended change in
 the program flow.
+
+Note: DICOM upload now involves ZIP extraction which adds latency,
+so the report upload and humanization typically finish first even
+when DICOM ultimately fails.
 """
 
 
@@ -51,6 +55,7 @@ the program flow.
         "humanization_module",
         "pii_redaction_module",
         "failing_module",
+        "magic_created",
     ),
     [
         (
@@ -58,24 +63,28 @@ the program flow.
             FakeHumanization(),
             FakePiiRedaction(),
             FailingDicomStorage,
+            True,
         ),
         (
             FailingReportStorage(),
             FakeHumanization(),
             FakePiiRedaction(),
             FailingReportStorage,
+            False,
         ),
         (
             FakeStorage(),
             FailingHumanization(),
             FakePiiRedaction(),
             FailingHumanization,
+            False,
         ),
         (
             FakeStorage(),
             FakeHumanization(),
             FailingPiiRedaction(),
             FailingPiiRedaction,
+            False,
         ),
     ],
 )
@@ -84,6 +93,7 @@ async def test_run_magic_link_not_created_on_fast_upload_fails(
     humanization_module: FakeHumanization,
     pii_redaction_module: FakePiiRedaction,
     failing_module: type,
+    magic_created: bool,
 ) -> None:
     pipeline = BridgePipeline(
         storage=storage_module,
@@ -94,7 +104,7 @@ async def test_run_magic_link_not_created_on_fast_upload_fails(
     record = build_simple_record()
     with pytest.raises(RuntimeError, match=failing_module.__name__):
         _ = await pipeline.run(record)
-    assert not storage_module.magic_requested
+    assert storage_module.magic_requested is magic_created
 
 
 async def test_run_magic_link_created_on_slow_upload_fails() -> None:

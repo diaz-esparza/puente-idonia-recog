@@ -1,4 +1,6 @@
 import asyncio
+import io
+import zipfile
 from hashlib import sha256
 from typing import override
 
@@ -88,6 +90,26 @@ class BridgePipeline(PipelinePort):
             root_span.set_attribute("tasks.humanize.uploaded", True)
             return result
 
+    async def _unzip_and_upload_dicom(
+        self,
+        study: DicomStudy,
+        dicom_zip: bytes,
+    ) -> None:
+        root_span = trace.get_current_span()
+        with _tracer.start_as_current_span("phase_ingest_dicom"):
+            with zipfile.ZipFile(io.BytesIO(dicom_zip)) as zf:
+                upload_tasks = [
+                    self.__storage.upload_dicom(study, zf.read(member))
+                    for member in zf.infolist()
+                    if not member.is_dir() and member.filename.endswith(".dcm")
+                ]
+            root_span.set_attribute(
+                "tasks.ingest.dicom.number_files",
+                len(upload_tasks),
+            )
+            await asyncio.gather(*upload_tasks)
+            root_span.set_attribute("tasks.ingest.dicom.success", True)
+
     @override
     async def run(self, record: MedicalRecordUpload) -> MagicLink:
         study = record.study
@@ -96,7 +118,7 @@ class BridgePipeline(PipelinePort):
             self._trace_study(span, study)
 
             tasks = [
-                self.__storage.upload_dicom(study, record.dicom_file),
+                self._unzip_and_upload_dicom(study, record.dicom_zip),
                 self.__storage.upload_report(study, record.report_file),
                 self._humanize_and_upload(study, record.report_file),
             ]

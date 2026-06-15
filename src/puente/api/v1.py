@@ -41,7 +41,7 @@ async def pipeline_run_form(
     record = MedicalRecordUpload(
         study=study,
         report_file=report_file_bytes,
-        dicom_file=dicom_file_bytes,
+        dicom_zip=dicom_file_bytes,
         password=password,
     )
     return await pipeline_run(record, pipeline)

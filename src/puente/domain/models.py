@@ -53,7 +53,7 @@ class MedicalRecordUpload(StrictModel):
 
     study: DicomStudy
     report_file: BytesOrBase64
-    dicom_file: BytesOrBase64
+    dicom_zip: BytesOrBase64
     password: SecretStr | None = None
 
     @field_validator("password", mode="after")

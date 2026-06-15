@@ -91,7 +91,7 @@ class DemoClient:
                     ),
                     "dicom_file": (
                         "study.dcm",
-                        record.dicom_file,
+                        record.dicom_zip,
                         "application/dicom",
                     ),
                 },

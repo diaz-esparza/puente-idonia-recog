@@ -6,7 +6,6 @@ from typing import cast, override
 import httpx
 import jwt
 import orjson
-from opentelemetry import trace
 from pydantic import SecretBytes, SecretStr, ValidationError
 
 from puente.config import get_settings
@@ -16,7 +15,6 @@ from puente.telemetry.getters import get_logger
 from puente.telemetry.timer import Timer
 
 _logger = get_logger(__name__)
-_tracer = trace.get_tracer(__name__)
 
 
 class IdoniaAdapter(MedicalStoragePort):
@@ -117,13 +115,11 @@ class IdoniaAdapter(MedicalStoragePort):
 
     @override
     async def upload_dicom(self, study: DicomStudy, content: bytes) -> str:
-        with _tracer.start_as_current_span("phase_ingest_dicom"):
-            return await self._upload_file(study, content, self.__href_dicom)
+        return await self._upload_file(study, content, self.__href_dicom)
 
     @override
     async def upload_report(self, study: DicomStudy, content: bytes) -> str:
-        with _tracer.start_as_current_span("phase_ingest_report"):
-            return await self._upload_file(study, content, self.__href_report)
+        return await self._upload_file(study, content, self.__href_report)
 
     def _get_container_route(self, study: DicomStudy) -> str:
         """Build container route according to specifications."""
