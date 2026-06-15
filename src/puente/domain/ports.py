@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from pydantic import SecretStr
+
 from puente.domain.models import DicomStudy, MagicLink, MedicalRecordUpload
 
 
@@ -17,8 +19,16 @@ class MedicalStoragePort(ABC):
         """Upload a report file, return file id."""
 
     @abstractmethod
-    async def create_magic_link(self, study: DicomStudy) -> MagicLink:
-        """Create magic link to access the study container."""
+    async def create_magic_link(
+        self,
+        study: DicomStudy,
+        password: SecretStr | None,
+    ) -> MagicLink:
+        """Create magic link to access the study container.
+
+        The optional password is hashed by the adapter before being sent to
+        the storage backend.
+        """
 
 
 class PiiRedactionPort(ABC):
@@ -31,7 +41,10 @@ class PiiRedactionPort(ABC):
 
     @abstractmethod
     def redact(self, text: str) -> str:
-        """De-identify PII from clinical text. Returns de-identified text."""
+        """De-identify PII from clinical text. Returns de-identified text.
+
+        It's a synchronous interface as it's expected to not be IO bound.
+        """
 
 
 class ReportHumanizationPort(ABC):
@@ -51,8 +64,9 @@ class PdfToTextPort(ABC):
 
     @abstractmethod
     def convert(self, pdf_file: bytes) -> str:
-        """Converts PDF file to plain text. Synchronous as it's expected to not
-        be IO bound.
+        """Converts PDF file to plain text.
+
+        It's a synchronous interface as it's expected to not be IO bound.
         """
 
 

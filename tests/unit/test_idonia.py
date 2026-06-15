@@ -21,9 +21,8 @@ class TestIdoniaAdapterHappy:
 
     def test_decode_secret_strips_s2_prefix(self) -> None:
         adapter = IdoniaAdapter()
-        encoded = "S2dGVzdHNlY3JldC0zMi1ieXRlcy1rZXktMDEyMzQ1Njc="
-        secret = adapter._decode_secret(SecretStr(encoded))
-        assert secret.get_secret_value() is not None
+        secret = "S2dGVzdHNlY3JldC0zMi1ieXRlcy1rZXktMDEyMzQ1Njc="
+        assert adapter._decode_secret(SecretStr(secret)).get_secret_value()
 
     def test_create_jwt_generates_valid_token(self) -> None:
         adapter = IdoniaAdapter()
@@ -33,9 +32,7 @@ class TestIdoniaAdapterHappy:
 
     def test_get_jwt_returns_cached_token_when_valid(self) -> None:
         adapter = IdoniaAdapter()
-        first = adapter._get_jwt()
-        second = adapter._get_jwt()
-        assert first == second
+        assert adapter._get_jwt() == adapter._get_jwt()
 
     async def test_upload_dicom_calls_correct_endpoint(
         self, respx_mock: respx.MockRouter, settings: Settings
@@ -71,11 +68,38 @@ class TestIdoniaAdapterHappy:
         ).respond(200, json=[{"URL": "https://magic.test/99", "PIN": "1234"}])
 
         adapter = IdoniaAdapter()
-        link = await adapter.create_magic_link(_make_study())
+        link = await adapter.create_magic_link(_make_study(), password=None)
 
         assert link.url == "https://magic.test/99"
         assert link.pin == "1234"
         assert route.called
+
+    def test_serialize_password_returns_empty_string_when_none(self) -> None:
+        assert IdoniaAdapter._serialize_password(None) == ""
+
+    def test_serialize_password_hashes_with_sha256_hex_base64(self) -> None:
+        # Reference value from IDONIA guide
+        password = SecretStr("1234")
+        assert (
+            IdoniaAdapter._serialize_password(password)
+            == "MDNhYzY3NDIxNmYzZTE1Yzc2MWVlMWE1ZTI1NWYwNj"
+            + "c5NTM2MjNjOGIzODhiNDQ1OWUxM2Y5NzhkN2M4NDZmNA=="
+        )
+
+    async def test_create_magic_link_sends_hashed_password(
+        self, respx_mock: respx.MockRouter, settings: Settings
+    ) -> None:
+        route = respx_mock.put(
+            f"{settings.idonia_base_url}/ml",
+        ).respond(200, json=[{"URL": "https://magic.test/99", "PIN": "1234"}])
+
+        adapter = IdoniaAdapter()
+        password = SecretStr("password-1234")
+        _ = await adapter.create_magic_link(_make_study(), password=password)
+
+        request = route.calls.last.request
+        sent_password = request.url.params.get("password")
+        assert sent_password == IdoniaAdapter._serialize_password(password)
 
 
 class TestIdoniaAdapterError:
@@ -123,7 +147,7 @@ class TestIdoniaAdapterError:
 
         adapter = IdoniaAdapter()
         with pytest.raises(RuntimeError, match="Unexpected Idonia"):
-            _ = await adapter.create_magic_link(_make_study())
+            _ = await adapter.create_magic_link(_make_study(), password=None)
 
     async def test_create_magic_link_raises_on_wrong_length(
         self, respx_mock: respx.MockRouter, settings: Settings
@@ -134,4 +158,4 @@ class TestIdoniaAdapterError:
 
         adapter = IdoniaAdapter()
         with pytest.raises(RuntimeError, match="Unexpected Idonia"):
-            _ = await adapter.create_magic_link(_make_study())
+            _ = await adapter.create_magic_link(_make_study(), password=None)

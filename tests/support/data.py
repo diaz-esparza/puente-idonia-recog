@@ -4,9 +4,14 @@ Re-uses the production mock generators from ``puente.cli.mocks`` whenever
 possible to avoid duplication.
 """
 
-import base64
+import zipfile
+from io import BytesIO
 
+import pydicom
 import pymupdf
+from pydantic import SecretStr
+from pydicom.dataset import Dataset, FileMetaDataset
+from pydicom.uid import UID, ExplicitVRLittleEndian, generate_uid
 
 from puente.cli.mocks import build_demo_record as _build_demo_record
 from puente.domain.models import DicomStudy, MedicalRecordUpload
@@ -35,8 +40,45 @@ def build_multipage_pdf() -> bytes:
 
 
 def build_simple_dicom() -> bytes:
-    """Minimal fake DICOM binary for tests."""
-    return b"fake-dicom-binary"
+    """Minimal fake DICOM zip for tests (one DICOM file inside)."""
+    dcm = build_simple_dicom_bytes()
+    buf = BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("slice0.dcm", dcm)
+    return buf.getvalue()
+
+
+def build_simple_dicom_bytes() -> bytes:
+    """Minimal valid DICOM bytes (single file, not zipped)."""
+    ds = Dataset()
+    ds.PatientID = "PT-001"
+    ds.AccessionNumber = "ACC-001"
+    ds.StudyDescription = "Test Study"
+    ds.StudyInstanceUID = generate_uid()
+    ds.SeriesInstanceUID = generate_uid()
+    sop_class_uid = UID("1.2.840.10008.5.1.4.1.1.2")
+    ds.SOPClassUID = sop_class_uid
+    ds.SOPInstanceUID = generate_uid()
+    ds.Modality = "CT"
+    ds.Rows = 2
+    ds.Columns = 2
+    ds.SamplesPerPixel = 1
+    ds.PhotometricInterpretation = "MONOCHROME2"
+    ds.BitsAllocated = 8
+    ds.BitsStored = 8
+    ds.HighBit = 7
+    ds.PixelRepresentation = 0
+    ds.PixelData = b"\x00" * 4
+
+    file_meta = FileMetaDataset()
+    file_meta.MediaStorageSOPClassUID = sop_class_uid
+    file_meta.MediaStorageSOPInstanceUID = ds.SOPInstanceUID
+    file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    ds.file_meta = file_meta
+    buf = BytesIO()
+    pydicom.dcmwrite(buf, ds, enforce_file_format=True)
+    return buf.getvalue()
 
 
 def build_simple_record(
@@ -45,6 +87,7 @@ def build_simple_record(
     accession_number: str = "ACC-2024-001",
     study_description: str = "Chest CT",
     report_text: str = "Original clinical report text.",
+    password: SecretStr | None = None,
 ) -> MedicalRecordUpload:
     """Create a minimal ``MedicalRecordUpload`` for unit tests.
 
@@ -60,6 +103,7 @@ def build_simple_record(
     dicom_file = build_simple_dicom()
     return MedicalRecordUpload(
         study=study,
-        report_file=base64.b64encode(report_pdf),
-        dicom_file=base64.b64encode(dicom_file),
+        report_file=report_pdf,
+        dicom_zip=dicom_file,
+        password=password,
     )

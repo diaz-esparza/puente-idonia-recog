@@ -43,6 +43,14 @@ class IdoniaMock:
             "Magic link creation was not requested"
         )
 
+    def latest_magic_password(self) -> str | None:
+        """Return the ``password`` query param from the last magic-link
+        request.
+        """
+        self.assert_magic_link_created()
+        request = self.__magic_put_route.calls.last.request
+        return request.url.params.get("password")
+
     def respond_dicom_error(self) -> None:
         """Replace the DICOM route response with an error."""
         _ = self.__dicom_route.respond(_ERROR_STATUS)

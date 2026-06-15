@@ -23,10 +23,6 @@ nlp_configuration:
       PER: PERSON
       PERSON: PERSON
       NORP: NRP
-      FAC: LOCATION
-      LOC: LOCATION
-      LOCATION: LOCATION
-      GPE: LOCATION
       ORG: ORGANIZATION
       ORGANIZATION: ORGANIZATION
 
@@ -48,6 +44,13 @@ nlp_configuration:
       # Potentially important for a health diagnoses
       - DATE
       - TIME
+      # Unmapped
+      - MISC
+      # Too many false positives
+      - FAC
+      - LOC
+      - LOCATION
+      - GPE
 
 
 recognizer_registry:

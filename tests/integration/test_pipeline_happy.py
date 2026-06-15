@@ -1,6 +1,7 @@
 """Basic integration tests for the `BridgePipeline` orchestrator."""
 
 import pytest
+from pydantic import SecretStr
 
 from puente.service.pipeline import BridgePipeline
 from tests.support.data import build_simple_record
@@ -86,6 +87,18 @@ async def test_run_creates_magic_link(
     assert result == storage.magic_link
     assert result.url == "https://fake.test/123"
     assert result.pin == "9999"
+
+
+async def test_run_passes_password_to_magic_link(
+    pipeline: BridgePipeline,
+    storage: FakeStorage,
+) -> None:
+    password = SecretStr("super-secret-123")
+    record = build_simple_record(password=password)
+
+    _ = await pipeline.run(record)
+
+    assert storage.last_password == password
 
 
 @pytest.mark.parametrize(

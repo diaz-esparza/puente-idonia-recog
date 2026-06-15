@@ -4,6 +4,7 @@ import asyncio
 
 import httpx
 import typer
+from pydantic import SecretStr
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -12,18 +13,20 @@ from puente.config import get_settings
 from puente.domain.models import DicomStudy, MagicLink, MedicalRecordUpload
 
 from .client import DemoClient
-from .mocks import build_demo_record
+from .mocks import build_demo_record, get_demo_source_info
 
 
 def _print_banner(console: Console) -> None:
     settings = get_settings()
+    _, source_label = get_demo_source_info()
     console.print(
         Panel.fit(
             "[bold cyan]Puente Idonia-Recog[/bold cyan] "
             + f"[bold yellow]v{settings.version}[/bold yellow]\n"
             + "[dim]Cuando los Picos de Europa separan al paciente de su "
             + "historia clínica, los datos deben cruzar la montaña antes que "
-            + "él.[/dim]",
+            + "él.[/dim]\n"
+            + f"[bold]Fuente DICOM:[/bold] {source_label}",
             title="[bold green]Demo[/bold green]",
             border_style="green",
         ),
@@ -32,8 +35,7 @@ def _print_banner(console: Console) -> None:
 
 def _print_patient_info(console: Console, study: DicomStudy) -> None:
     console.print(
-        "\n[bold]Paciente:[/bold] Juan Martínez López "
-        + f"([dim]{study.patient_id}[/dim])",
+        f"\n[bold]Paciente:[/bold] [dim]{study.patient_id}[/dim]",
     )
     console.print(f"[bold]Estudio:[/bold] {study.study_description}")
     console.print(f"[bold]Accession:[/bold] {study.accession_number}")
@@ -59,11 +61,20 @@ def _print_phases(console: Console) -> None:
     )
 
 
-def _print_result(console: Console, magic_link: MagicLink) -> None:
+def _print_result(
+    console: Console,
+    magic_link: MagicLink,
+    password: SecretStr | None,
+) -> None:
     settings = get_settings()
     table = Table(show_header=False, box=None)
     table.add_row("URL", f"{settings.idonia_output_url}/{magic_link.url}")
     table.add_row("PIN", f"[bold]{magic_link.pin}[/bold]")
+    if password is not None:
+        table.add_row(
+            "Contraseña",
+            f"[bold]{password.get_secret_value()}[/bold]",
+        )
 
     console.print(
         Panel(
@@ -100,12 +111,13 @@ async def _run_api(
 def main(console: Console) -> None:
     _print_banner(console)
 
-    with console.status("[bold green]Generando documentos de prueba..."):
+    with console.status(
+        "[bold green]Cargando DICOM y generando informe de prueba..."
+    ):
         record = build_demo_record()
 
     _print_patient_info(console, record.study)
     _print_phases(console)
-    record = build_demo_record()
 
     try:
         magic_link = asyncio.run(_run_api(console, record))
@@ -119,4 +131,4 @@ def main(console: Console) -> None:
         console.print(f"\n[bold red]Error genérico:[/bold red] {exc}")
         raise typer.Exit(code=1) from exc
 
-    _print_result(console, magic_link)
+    _print_result(console, magic_link, record.password)
